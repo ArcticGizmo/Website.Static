@@ -14,10 +14,11 @@ import { ref } from 'vue'
 const OPTIONS = [
   'Her Butt',
   'Her Smile',
-  'Her K-Pop adiction',
+  'Her K-Pop addiction',
   'She is a social justice warrior',
   'Sleeps like an absolute muffin',
-  'She asks me if I am alright'
+  'She asks me if I am alright',
+  'Thinks my spelling is great'
 ]
 
 const index = ref(0);
