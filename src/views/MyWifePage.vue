@@ -1,11 +1,14 @@
-
 <template>
-  <img src="/finger-heart.png" class="finger-heart" alt="Vite logo" />
-  <h3>What is great about my wife?</h3>
-  <br>
-  <h2>{{ OPTIONS[index] }}</h2>
+  <v-container class="fill-height">
+    <v-responsive class="align-center text-center fill-height">
+      <v-img src="/finger-heart.png" class="finger-heart" alt="Korean Finger Heart" />
+      <h4 class="text-h4 pb-16">What is great about my wife?</h4>
 
-  <button type="button" @click="onNext()">Next</button>
+      <h3 class="text-h3 font-weight-bold pb-8">{{ OPTIONS[index] }}</h3>
+
+      <v-btn size="x-large" @click="onNext()">Next</v-btn>
+    </v-responsive>
+  </v-container>
 </template>
 
 <script setup lang="ts">

@@ -1,5 +1,15 @@
-import { createApp } from 'vue'
-import './style.css'
+// Components
 import App from './App.vue'
 
-createApp(App).mount('#app')
+// Composables
+import { createApp } from 'vue'
+import { Auth0Client } from './composables/auth0'
+
+// Plugins
+import { registerPlugins } from '@/plugins'
+
+const app = createApp(App).use(Auth0Client)
+
+registerPlugins(app)
+
+app.mount('#app')
