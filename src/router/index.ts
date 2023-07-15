@@ -31,6 +31,15 @@ export const routes: RouteRecordRaw[] = [
       title: 'My Wife'
     },
   },
+  {
+    path: '/decision-maker',
+    name: 'DecisionMaker',
+    component: () => import(/* webpackChunkName: "decision-maker" */ '@/views/DecisionMakerPage.vue'),
+    meta: {
+      icon: 'mdi-dice-6',
+      title: 'Decision Maker'
+    },
+  }
 ]
 
 
