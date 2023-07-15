@@ -23,7 +23,7 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: 'my-wife',
+    path: '/my-wife',
     name: 'MyWife',
     component: () => import(/* webpackChunkName: "my-wife" */ '@/views/MyWifePage.vue'),
     meta: {
@@ -31,19 +31,21 @@ export const routes: RouteRecordRaw[] = [
       title: 'My Wife'
     },
   },
+  {
+    path: '/decision-maker',
+    name: 'DecisionMaker',
+    component: () => import(/* webpackChunkName: "decision-maker" */ '@/views/DecisionMakerPage.vue'),
+    meta: {
+      icon: 'mdi-dice-6',
+      title: 'Decision Maker'
+    },
+  }
 ]
 
-const routeWrapper = [
-  {
-    path: '/',
-    component: () => import('@/layouts/default/Default.vue'),
-    children: routes,
-  },
-]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes: routeWrapper
+  routes
 })
 
 export default router
