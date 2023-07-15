@@ -23,7 +23,7 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: 'my-wife',
+    path: '/my-wife',
     name: 'MyWife',
     component: () => import(/* webpackChunkName: "my-wife" */ '@/views/MyWifePage.vue'),
     meta: {
@@ -33,17 +33,10 @@ export const routes: RouteRecordRaw[] = [
   },
 ]
 
-const routeWrapper = [
-  {
-    path: '/',
-    component: () => import('@/layouts/default/Default.vue'),
-    children: routes,
-  },
-]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes: routeWrapper
+  routes
 })
 
 export default router
