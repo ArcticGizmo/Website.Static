@@ -7,6 +7,10 @@ import { useToast } from 'vue-toast-notification';
 
 const BASE_URL = import.meta.env['VITE_API_URL'];
 
+setTimeout(() => {
+  console.dir(BASE_URL);
+}, 5000);
+
 const toast = useToast({ position: 'top' });
 
 const authMiddleware = (next: FetchLike) => async (url: string, opts: WretchOptions) => {
