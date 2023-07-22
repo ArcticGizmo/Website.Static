@@ -1,17 +1,19 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router'
+import { authGuard } from "@auth0/auth0-vue";
 
 // Extend the meta type
 declare module 'vue-router' {
   interface RouteMeta {
-    icon: string,
-    title: string,
+    icon?: string,
+    title?: string,
+    secure?: boolean,
   }
 }
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '',
-    redirect: 'Home'
+    redirect: '/home'
   },
   {
     path: '/home',
@@ -21,6 +23,14 @@ export const routes: RouteRecordRaw[] = [
       icon: 'mdi-home',
       title: 'Home'
     },
+  },
+  {
+    path: '/my-profile',
+    name: 'MyProfile',
+    component: () => import(/* webpackChunkName: "my-profile" */ '@/views/MyProfilePage.vue'),
+    meta: {
+      secure: true,
+    }
   },
   {
     path: '/my-wife',
@@ -39,8 +49,25 @@ export const routes: RouteRecordRaw[] = [
       icon: 'mdi-dice-6',
       title: 'Decision Maker'
     },
+  },
+  {
+    path: '/security',
+    name: 'Security',
+    component: () => import(/* webpackChunkName: "security" */ '@/views/SecurityPage.vue'),
+    meta: {
+      icon: 'mdi-security',
+      title: 'Security',
+      secure: true
+    }
   }
 ]
+
+// Add protection guards
+routes.forEach(r => {
+  if (r.meta?.secure) {
+    r.beforeEnter = authGuard;
+  }
+})
 
 
 const router = createRouter({

@@ -15,8 +15,10 @@
     "roboto-fontface": "*",
     "vue": "^3.2.0",
     "vue-router": "^4.0.0",
+    "vue-toast-notification": "^3.1.1",
     "vuetify": "^3.0.0",
-    "webfontloader": "^1.0.0"
+    "webfontloader": "^1.0.0",
+    "wretch": "^2.6.0"
   },
   "devDependencies": {
     "@babel/types": "^7.21.4",
