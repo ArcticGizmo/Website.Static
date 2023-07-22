@@ -1,15 +1,15 @@
 // Components
-import App from './App.vue'
+import App from './App.vue';
 
 // Composables
-import { createApp } from 'vue'
-import { Auth0Client } from './composables/auth0'
+import { createApp } from 'vue';
+import { Auth0Client } from './composables/auth0';
 
 // Plugins
-import { registerPlugins } from '@/plugins'
+import { registerPlugins } from '@/plugins';
 
-const app = createApp(App).use(Auth0Client)
+const app = createApp(App).use(Auth0Client);
 
-registerPlugins(app)
+registerPlugins(app);
 
-app.mount('#app')
+app.mount('#app');
