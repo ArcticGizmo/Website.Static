@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix --ignore-path .gitignore"
+    "lint": "eslint . --fix --ignore-path .gitignore",
+    "serve-dist": "serve -s dist"
   },
   "dependencies": {
     "@auth0/auth0-vue": "^2.2.1",
@@ -29,6 +30,7 @@
     "eslint": "^8.22.0",
     "eslint-plugin-vue": "^9.3.0",
     "sass": "^1.60.0",
+    "serve": "^14.2.0",
     "typescript": "^5.0.0",
     "vite": "^4.2.0",
     "vite-plugin-vuetify": "^1.0.0",
