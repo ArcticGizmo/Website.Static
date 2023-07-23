@@ -7,6 +7,7 @@
       <br />
       <v-btn @click="onFetchBacon()">Get Bacon</v-btn>
       <v-btn @click="onFetchAdmin()">Get Admin</v-btn>
+      <v-btn @click="onFetchProfile()">Get Profile</v-btn>
     </v-responsive>
   </v-container>
 </template>
@@ -33,6 +34,7 @@ const request = async (url: string) => {
     console.dir(resp);
     if (resp && resp.status === 200) {
       toast.success('Wooo it worked');
+      console.dir(await resp.json());
     }
   } catch (error) {
     console.error(error);
@@ -42,6 +44,7 @@ const request = async (url: string) => {
 
 const onFetchBacon = async () => request('configuration/bacon');
 const onFetchAdmin = async () => request('configuration/admin');
+const onFetchProfile = async () => request('profile');
 </script>
 
 <style scoped>
