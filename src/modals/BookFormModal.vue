@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-4">
-    <v-card-title class="text-h5"> {{ edit ? 'Edit' : 'Create' }} Book</v-card-title>
+    <v-card-title class="text-h5"> {{ isEdit ? 'Edit' : 'Create' }} Book</v-card-title>
     <v-form @submit.prevent="onSubmit">
       <v-text-field label="Title" v-model="form.title" :counter="255" required />
       <v-text-field label="ISBN" v-model="form.isbn" :counter="13" />
@@ -33,10 +33,13 @@ import { useModal } from '@/composables/modal';
 import { BookContent } from '@/types/library';
 import { onMounted, ref } from 'vue';
 import ImagePicker from '@/components/ImagePicker.vue';
+import { computed } from 'vue';
 
-const props = defineProps<{ content?: BookContent; edit?: boolean }>();
+const props = defineProps<{ content?: BookContent }>();
 
 const modal = useModal();
+
+const isEdit = computed(() => !!props.content);
 
 const form = ref<BookContent>({
   title: '',

@@ -60,7 +60,7 @@ const { http } = useHttp();
 const modalController = useModalController();
 
 const library = ref<LibraryWithBooks>({
-  library: { id: '', name: '' },
+  library: { id: '', ownerUserId: '', name: '' },
   books: [],
 });
 

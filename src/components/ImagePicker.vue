@@ -23,10 +23,13 @@
         ref="fileInput"
         v-show="false"
         v-model="fileValue"
+        capture="environment"
         accept="image/*"
         label="File input"
       />
       <v-btn block @click="onUploadFile"> Upload File<v-icon>mdi-file</v-icon> </v-btn>
+      <input type="file" accept="image/*" capture="environment">
+
     </v-col>
   </v-row>
 </template>

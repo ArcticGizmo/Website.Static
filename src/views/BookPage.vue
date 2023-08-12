@@ -89,7 +89,6 @@ const fetchBook = async () => {
     .get(props.bookId)
     .notFound(() => (notFound.value = true))
     .json<Book>();
-
 };
 
 const onBack = () => router.back();

@@ -1,5 +1,6 @@
 export interface Library {
   id: string;
+  ownerUserId: string;
   name: string;
 }
 
