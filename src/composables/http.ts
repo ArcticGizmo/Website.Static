@@ -27,28 +27,35 @@ const authMiddleware = (next: FetchLike) => async (url: string, opts: WretchOpti
   return next(url, opts);
 };
 
-const wretchClient = wretch().addon(FormDataAddon).addon(QueryStringAddon);
+const wretchClient = wretch()
+  .addon(FormDataAddon)
+  .addon(QueryStringAddon)
+  .resolve(resolver =>
+    resolver
+      .badRequest(() => {
+        toast.warning('400: Bad Request');
+      })
+      .unauthorized(() => {
+        toast.error('401: Unauthenticated');
+      })
+      .forbidden(() => {
+        toast.error('403: Unauthorized');
+      })
+      .notFound(() => {
+        toast.warning('404: Not Found');
+      }),
+  );
 
 export function useHttp() {
-  const httpClient = wretchClient
-    .resolve(resolver =>
-      resolver
-        .badRequest(() => {
-          toast.warning('400: Bad Request');
-        })
-        .unauthorized(() => {
-          toast.error('401: Unauthenticated');
-        })
-        .forbidden(() => {
-          toast.error('403: Unauthorized');
-        })
-        .notFound(() => {
-          toast.warning('404: Not Found');
-        }),
-    )
-    .middlewares([authMiddleware]);
+  const httpClient = wretchClient.middlewares([authMiddleware]);
 
   const http = (url: string) => httpClient.url(`${BASE_URL}${url}`);
+
+  return { http };
+}
+
+export function useAnonymousHttp() {
+  const http = (url: string) => wretchClient.url(`${BASE_URL}${url}`);
 
   return { http };
 }

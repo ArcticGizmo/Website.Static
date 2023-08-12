@@ -17,12 +17,12 @@
 import DefaultLayout from '@/layouts/default/Default.vue';
 import ModalProvider from './components/ModalProvider.vue';
 
-import { useHttp } from '@/composables/http';
+import { useAnonymousHttp } from '@/composables/http';
 import { ref } from 'vue';
 
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
-const { http } = useHttp();
+const { http } = useAnonymousHttp();
 
 const serverAlive = ref(true);
 
