@@ -38,5 +38,7 @@ const checkStatus = async () => {
   }
 };
 
-checkStatus();
+if (!import.meta.env.DEV) {
+  checkStatus();
+}
 </script>

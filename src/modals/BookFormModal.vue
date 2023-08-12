@@ -1,6 +1,9 @@
 <template>
   <v-card class="pa-4">
     <v-card-title class="text-h5"> {{ isEdit ? 'Edit' : 'Create' }} Book</v-card-title>
+    <v-btn class="my-2" color="primary" block @click="onScan()"
+      >Scan Barcode <v-icon>mdi-barcode</v-icon></v-btn
+    >
     <v-form @submit.prevent="onSubmit">
       <v-text-field label="Title" v-model="form.title" :counter="255" required />
       <v-text-field label="ISBN" v-model="form.isbn" :counter="13" />
@@ -71,5 +74,9 @@ onMounted(() => {
 
 const onSubmit = () => {
   modal.close({ ...form.value });
+};
+
+const onScan = () => {
+  console.dir('--- on scan');
 };
 </script>
