@@ -32,6 +32,7 @@ const checkStatus = async () => {
     serverAlive.value = resp.ok;
     setTimeout(() => checkStatus(), CHECK_INTERVAL_MS);
   } catch (error) {
+    console.error(error);
     serverAlive.value = false;
     setTimeout(() => checkStatus(), 30_000);
   }
