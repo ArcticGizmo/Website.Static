@@ -19,17 +19,17 @@
         @change="onUrlChange"
       />
       <!-- hidden and triggered by the file button instead -->
+      <v-file-input ref="fileInput" v-show="false" v-model="fileValue" accept="image/*" />
       <v-file-input
-        ref="fileInput"
+        ref="cameraInput"
         v-show="false"
         v-model="fileValue"
         capture="environment"
         accept="image/*"
-        label="File input"
       />
       <v-btn block @click="onUploadFile"> Upload File<v-icon>mdi-file</v-icon> </v-btn>
-      <input type="file" accept="image/*" capture="environment">
-
+      <br />
+      <v-btn block @click="onTakePicture"> Take Picture<v-icon>mdi-camera</v-icon> </v-btn>
     </v-col>
   </v-row>
 </template>
@@ -48,7 +48,7 @@ const props = defineProps({
   fallbackIcon: String,
   height: String,
   width: String,
-  maxFileSize: { type: Number, default: 100_000 },
+  maxFileSize: { type: Number, default: 10_000_000 },
 });
 
 const emits = defineEmits<{
@@ -56,11 +56,16 @@ const emits = defineEmits<{
 }>();
 
 const fileInput = ref();
+const cameraInput = ref();
 const fileValue = ref();
 const errorMessage = ref<string>();
 
 const onUploadFile = () => {
   fileInput.value.click();
+};
+
+const onTakePicture = () => {
+  cameraInput.value.click();
 };
 
 const onUrlChange = (event: ChangeEvent) => {
