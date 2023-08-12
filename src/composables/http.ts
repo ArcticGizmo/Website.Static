@@ -8,8 +8,8 @@ import { useToast } from 'vue-toast-notification';
 const BASE_URL = import.meta.env['VITE_API_URL'];
 
 setTimeout(() => {
-  console.dir(BASE_URL);
-}, 5000);
+  console.log(`Connecting to API at ${BASE_URL}`);
+}, 1500);
 
 const toast = useToast({ position: 'top' });
 

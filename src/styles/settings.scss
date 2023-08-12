@@ -8,3 +8,7 @@
 // @use 'vuetify/settings' with (
 //   $color-pack: false
 // );
+
+.v-toast {
+    z-index: 1000000;
+}
