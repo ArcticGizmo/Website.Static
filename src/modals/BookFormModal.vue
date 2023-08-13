@@ -192,6 +192,7 @@ const onScan = async () => {
     isbnField.value.value = isbn;
     authorsField.value.value = book.authors;
     seriesField.value.value = book.series || '';
+    pageCountField.value.value = book.pageCount || undefined;
 
     toast.info('Book Updated!');
   } catch (error) {

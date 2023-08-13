@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount } from 'vue';
 import { ref } from 'vue';
-import { BrowserMultiFormatReader, Exception } from '@zxing/library';
+import { BarcodeFormat, BrowserMultiFormatReader, DecodeHintType, Exception } from '@zxing/library';
 import { useCamera } from '@/composables/camera';
 
 const emits = defineEmits<{
@@ -44,7 +44,11 @@ const emits = defineEmits<{
 const flipped = ref(false);
 const show = ref(true);
 
-const scanner = new BrowserMultiFormatReader();
+const hints = new Map();
+const formats = [BarcodeFormat.EAN_13];
+hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
+
+const scanner = new BrowserMultiFormatReader(hints);
 
 const devices = ref<MediaDeviceInfo[]>([]);
 

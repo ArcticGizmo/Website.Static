@@ -67,12 +67,12 @@ const toBookContent = (book: BookRespContent): OpenBookContent => {
 };
 
 const extractSeries = (book: BookRespContent) => {
-  const match = (book.subjects || []).find(s => s.name.startsWith('series:'));
+  const match = (book.subjects || []).find(s => s.name.includes('series:'));
   if (!match) {
     return;
   }
 
-  return match.name.replace('series:', '').replaceAll('_', ' ');
+  return match.name.replace('series:', '').replace('[', '').replace(']', '').replaceAll('_', ' ');
 };
 
 export const useOpenBooks = () => {
