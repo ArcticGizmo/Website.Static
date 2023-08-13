@@ -12,6 +12,18 @@
         :error-messages="titleField.errorMessage.value"
       />
       <v-text-field
+        label="Series"
+        v-model="seriesField.value.value"
+        :counter="255"
+        :error-messages="seriesField.errorMessage.value"
+      />
+      <v-text-field
+        label="Book In Series"
+        type="number"
+        v-model="bookInSeriesField.value.value"
+        :error-messages="bookInSeriesField.errorMessage.value"
+      />
+      <v-text-field
         label="ISBN"
         v-model="isbnField.value.value"
         :counter="13"

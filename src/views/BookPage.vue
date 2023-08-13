@@ -23,8 +23,9 @@
             />
           </v-col>
           <v-col align-self="center">
-            <v-text-field variant="solo" readonly label="Title" :model-value="book.content.title" />
+            <v-text-field label="Title" variant="solo" readonly :model-value="book.content.title" />
             <v-text-field label="ISBN" readonly variant="solo" :model-value="book.content.isbn" />
+            <v-text-field label="Series (#No)" readonly varient="solo" :model-value="seriesText" />
             <v-combobox
               label="Authors"
               variant="solo"
@@ -33,14 +34,7 @@
               chips
               multiple
             />
-            <v-combobox
-              label="Tags"
-              variant="solo"
-              readonly
-              :model-value="book.content.tags"
-              chips
-              multiple
-            />
+
             <v-text-field
               label="Pages"
               readonly
@@ -60,6 +54,14 @@
           color="grey"
           active-color="orange"
         />
+        <v-combobox
+          label="Tags"
+          variant="solo"
+          readonly
+          :model-value="book.content.tags"
+          chips
+          multiple
+        />
       </v-card>
     </v-responsive>
   </v-container>
@@ -75,6 +77,7 @@ import { ref } from 'vue';
 import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import BookFormModal from '@/modals/BookFormModal.vue';
 import { useModalController } from '@/composables/modal';
+import { computed } from 'vue';
 
 const props = defineProps<{ bookId: string }>();
 
@@ -84,6 +87,19 @@ const notFound = ref(false);
 const { http } = useHttp();
 const dialogController = useDialog();
 const modalController = useModalController();
+
+const seriesText = computed(() => {
+  const b = book.value;
+  if (!b) {
+    return;
+  }
+  const { series, bookInSeries } = b.content;
+  if (!series || !bookInSeries) {
+    return '';
+  }
+
+  return `${series} #${bookInSeries}`;
+});
 
 onMounted(() => {
   fetchBook();
