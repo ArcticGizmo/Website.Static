@@ -60,6 +60,7 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       icon: 'mdi-library-shelves',
       title: 'Libraries',
+      secure: true,
     },
   },
   {
@@ -67,12 +68,18 @@ export const routes: RouteRecordRaw[] = [
     name: 'Library',
     props: true,
     component: () => import(/* webpackChunkName: "library" */ '@/views/LibraryPage.vue'),
+    meta: {
+      secure: true,
+    },
   },
   {
     path: '/book/:bookId',
     name: 'Book',
     props: true,
     component: () => import(/* webpackChunkName: "book" */ '@/views/BookPage.vue'),
+    meta: {
+      secure: true,
+    },
   },
   {
     path: '/security',

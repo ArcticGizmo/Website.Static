@@ -35,7 +35,7 @@
 import { onMounted, onBeforeUnmount } from 'vue';
 import { ref } from 'vue';
 import { BrowserMultiFormatReader, Exception } from '@zxing/library';
-import { useCameraPermissions } from '@/composables/cameraPermissions';
+import { useCamera } from '@/composables/camera';
 
 const emits = defineEmits<{
   decoded: [value: string];
@@ -49,7 +49,7 @@ const scanner = new BrowserMultiFormatReader();
 const devices = ref<MediaDeviceInfo[]>([]);
 
 const selectedDevice = ref<MediaDeviceInfo>();
-const { requestPermission, allowed, rejected, requesting } = useCameraPermissions();
+const { requestPermission, allowed, rejected, requesting, getDevices, getBackCamera } = useCamera();
 
 onMounted(async () => {
   if (!allowed.value && !rejected.value) {
@@ -61,8 +61,9 @@ onMounted(async () => {
 });
 
 const init = async () => {
-  devices.value = await scanner.listVideoInputDevices();
-  onSetDevice(devices.value[0]);
+  devices.value = await getDevices();
+  const backCamera = await getBackCamera();
+  onSetDevice(backCamera);
 };
 
 onBeforeUnmount(() => {
