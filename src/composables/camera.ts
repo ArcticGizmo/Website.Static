@@ -8,7 +8,9 @@ export const useCamera = () => {
   const bindTo = async (element: HTMLVideoElement) => {
     _element = element;
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
       element.srcObject = stream;
       element.onloadedmetadata = () => {
         element.play();
