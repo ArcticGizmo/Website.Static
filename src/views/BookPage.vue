@@ -41,6 +41,12 @@
               chips
               multiple
             />
+            <v-text-field
+              label="Pages"
+              readonly
+              variant="solo"
+              :model-value="book.content.pageCount"
+            />
           </v-col>
         </v-row>
         <v-rating

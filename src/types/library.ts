@@ -11,11 +11,12 @@ export interface Book {
 }
 
 export interface BookContent {
-  coverImageUrl?: string;
   isbn?: string;
   title: string;
   authors?: string[];
+  coverImageUrl?: string;
   series?: string;
+  pageCount?: number;
   bookInSeries?: number;
   tags?: string[];
   rating?: number;
