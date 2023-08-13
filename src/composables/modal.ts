@@ -8,6 +8,7 @@ import type {
 } from 'vue';
 import { VDialog } from 'vuetify/lib/components/index.mjs';
 import { DeferredPromise, type DefferablePromise } from '@/util/deferredPromise';
+import LoadingModal from '@/modals/LoadingModal.vue';
 
 type ModalOptions = ExtractPublicPropTypes<VDialog['$props']>;
 
@@ -26,6 +27,11 @@ export interface Modal<T extends Component, K> extends ModalConfig<T> {
   show: Ref<boolean>;
   promise: DefferablePromise<K>;
   destroy: () => void;
+}
+
+interface ShowLoadingOptions {
+  title?: string;
+  message?: string;
 }
 
 let ID = 1;
@@ -64,13 +70,32 @@ const createModal = <T extends Component, K>(config: ModalConfig<T>): Modal<T, K
 };
 
 const show = <K, C extends Component = Component>(config: ModalConfig<C>) => {
+  return create<K, C>(config).promise;
+};
+
+const create = <K, C extends Component = Component>(config: ModalConfig<C>) => {
   const modal = createModal<C, K | undefined>(config);
   MODAL_LOOKUP.value[modal.modalId] = modal;
-  return modal.promise;
+  return modal;
+};
+
+let loadingModal: Modal<typeof LoadingModal, unknown>;
+
+const showLoading = (options: ShowLoadingOptions) => {
+  hideLoading();
+
+  const props = { title: options.title, message: options.message };
+
+  loadingModal = create({ component: LoadingModal, options: { persistent: true }, props });
+  return loadingModal;
+};
+
+const hideLoading = () => {
+  loadingModal?.destroy();
 };
 
 export const useModalController = () => {
-  return { show };
+  return { show, create, showLoading, hideLoading };
 };
 
 export const useModal = () => {
