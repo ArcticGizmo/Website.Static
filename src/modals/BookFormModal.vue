@@ -32,15 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import { useModal } from '@/composables/modal';
+import { useModal, useModalController } from '@/composables/modal';
 import { BookContent } from '@/types/library';
 import { onMounted, ref } from 'vue';
 import ImagePicker from '@/components/ImagePicker.vue';
 import { computed } from 'vue';
+import BarcodeScannerModal from './BarcodeScannerModal.vue';
 
 const props = defineProps<{ content?: BookContent }>();
 
 const modal = useModal();
+const modalController = useModalController();
 
 const isEdit = computed(() => !!props.content);
 
@@ -76,7 +78,12 @@ const onSubmit = () => {
   modal.close({ ...form.value });
 };
 
-const onScan = () => {
+const onScan = async () => {
   console.dir('--- on scan');
+  const resp = await modalController.show({
+    component: BarcodeScannerModal,
+    options: { maxWidth: '500px' },
+  });
+  console.dir(resp);
 };
 </script>
