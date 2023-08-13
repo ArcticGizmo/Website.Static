@@ -1,8 +1,6 @@
 import { ref } from 'vue';
 
-export interface DeviceInfo {
-  readonly id: string;
-}
+const BLACKLIST = ['camera2 3, facing front', 'camera2 2, facing back'];
 
 const requesting = ref(false);
 const allowed = ref(false);
@@ -23,7 +21,7 @@ const requestPermission = async () => {
 const getDevices = async (): Promise<MediaDeviceInfo[]> => {
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    return devices.filter(d => d.kind === 'videoinput');
+    return devices.filter(d => d.kind === 'videoinput' && !BLACKLIST.includes(d.label));
   } catch (error) {
     console.error(error);
     return [];
@@ -31,16 +29,8 @@ const getDevices = async (): Promise<MediaDeviceInfo[]> => {
 };
 
 const getBackCamera = async (): Promise<MediaDeviceInfo | undefined> => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' },
-    });
-    const trackLabel = stream.getVideoTracks()[0].label;
-    const devices = await getDevices();
-    return devices.find(d => d.label === trackLabel);
-  } catch (error) {
-    return;
-  }
+  const devices = await getDevices();
+  return devices.find(d => d.label.includes('back'));
 };
 
 export const useCamera = () => {

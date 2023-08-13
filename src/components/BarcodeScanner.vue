@@ -1,23 +1,23 @@
 <template>
   <div class="barcode-scanner text-center">
     <div v-if="allowed" class="allowed">
-      <video v-if="show" id="video" class="h-100 w-100" :class="{ flipped }" />
-      <v-row class="ma-0">
+      <video id="video" class="h-100 w-100" :class="{ flipped }" />
+      <div class="ma-2 d-flex">
         <v-select
-          class="pa-3 ma-0"
+          class="py-3 ma-0"
           variant="solo"
           no-data-text="No devices found"
-          :model-value="selectedDevice"
+          :model-value="selectedDeviceId"
           :items="devices"
+          item-value="deviceId"
           item-title="label"
-          return-object
           hide-details
           @update:model-value="onSetDevice"
         />
-        <v-btn class="ma-3" style="height: 3.5rem" @click="flipped = !flipped">
+        <v-btn class="ml-2 my-3" style="height: 3.5rem" @click="flipped = !flipped">
           <v-icon size="large">mdi-flip-horizontal</v-icon>
         </v-btn>
-      </v-row>
+      </div>
     </div>
     <v-card v-else-if="requesting" class="loading">
       <v-card-title>Requesting Permission</v-card-title>
@@ -48,7 +48,7 @@ const scanner = new BrowserMultiFormatReader();
 
 const devices = ref<MediaDeviceInfo[]>([]);
 
-const selectedDevice = ref<MediaDeviceInfo>();
+const selectedDeviceId = ref<string>();
 const { requestPermission, allowed, rejected, requesting, getDevices, getBackCamera } = useCamera();
 
 onMounted(async () => {
@@ -62,8 +62,8 @@ onMounted(async () => {
 
 const init = async () => {
   devices.value = await getDevices();
-  const backCamera = await getBackCamera();
-  onSetDevice(backCamera);
+  const backCamera = (await getBackCamera()) || devices.value[0];
+  onSetDevice(backCamera.deviceId);
 };
 
 onBeforeUnmount(() => {
@@ -73,17 +73,17 @@ onBeforeUnmount(() => {
   show.value = false;
 });
 
-const onSetDevice = (device?: MediaDeviceInfo) => {
-  if (!device) {
+const onSetDevice = (id?: string) => {
+  if (!id) {
     return;
   }
 
-  selectedDevice.value = device;
+  selectedDeviceId.value = id;
   start();
 };
 
 const start = () => {
-  const id = selectedDevice.value?.deviceId;
+  const id = selectedDeviceId.value;
   if (!id) {
     return;
   }
