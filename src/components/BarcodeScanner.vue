@@ -1,6 +1,6 @@
 <template>
   <div class="barcode-scanner">
-    <video id="video" ref="scanner" class="h-100 w-100" :class="{ flipped }" />
+    <video v-if="show" id="video" ref="scanner" class="h-100 w-100" :class="{ flipped }" />
     <v-row class="ma-0">
       <v-select
         class="pa-3 ma-0"
@@ -20,9 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeMount } from 'vue';
+import { onMounted, onBeforeUnmount } from 'vue';
 import { ref } from 'vue';
-
 import { BrowserMultiFormatReader, Exception } from '@zxing/library';
 
 const emits = defineEmits<{
@@ -30,6 +29,7 @@ const emits = defineEmits<{
 }>();
 
 const flipped = ref(false);
+const show = ref(true);
 
 const scanner = new BrowserMultiFormatReader();
 
@@ -42,9 +42,11 @@ onMounted(async () => {
   onSetDevice(devices.value[0]);
 });
 
-onBeforeMount(() => {
+onBeforeUnmount(() => {
   scanner.reset();
-  selectedDevice.value = undefined;
+  scanner.stopContinuousDecode();
+  scanner.stopAsyncDecode();
+  show.value = false;
 });
 
 const onSetDevice = (device?: MediaDeviceInfo) => {
