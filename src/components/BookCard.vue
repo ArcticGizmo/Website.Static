@@ -3,11 +3,27 @@
     <v-row class="ma-0 fill-height">
       <v-col cols="3" class="pa-2">
         <ImageWithPlaceholder
-          contain
           class="bg-white fill-height"
+          :class="{ wishlist: book.content.wishlist }"
+          contain
           :src="book.content.coverImageUrl"
           fallback-icon="mdi-book"
         />
+        <div class="icons text-left" @click.stop>
+          <v-tooltip v-if="book.content.wishlist" location="top">
+            <template #activator="{ props }">
+              <v-icon size="small" v-bind="props">mdi-tag-heart-outline</v-icon>
+            </template>
+            Wishlist
+          </v-tooltip>
+
+          <v-tooltip v-if="book.content.read" location="top">
+            <template #activator="{ props }">
+              <v-icon size="small" v-bind="props">mdi-check</v-icon>
+            </template>
+            Read
+          </v-tooltip>
+        </div>
       </v-col>
       <v-col class="text-left">
         <h2>{{ book.content.title }}</h2>
@@ -77,5 +93,16 @@ const seriesText = computed(() => {
 
 .v-img__error {
   border: 1px solid gray;
+}
+
+.icons {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.637);
+}
+
+.wishlist {
+  opacity: 0.5;
 }
 </style>

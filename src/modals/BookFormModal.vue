@@ -56,6 +56,8 @@
         closable-chips
         :error-messages="tagsField.errorMessage.value"
       />
+      <v-switch label="Read" v-model="readField.value.value" />
+      <v-switch label="Wishlist" v-model="wishlistField.value.value" />
       <v-row class="ma-0">
         <v-spacer @click="ratingField.value.value = 0"></v-spacer>
         <v-rating
@@ -72,6 +74,11 @@
         />
         <v-spacer @click="ratingField.value.value = 5"></v-spacer>
       </v-row>
+      <v-textarea
+        label="Notes"
+        v-model="notesField.value.value"
+        :error-messages="notesField.errorMessage.value"
+      />
 
       <v-btn type="submit" color="primary" block class="mt-2">Submit</v-btn>
     </form>
@@ -105,6 +112,7 @@ const schema = yup.object({
     .min(0)
     .integer()
     .nullable(),
+  notes: yup.string().max(1000),
 });
 
 const form = useForm<yup.InferType<typeof schema>>({
@@ -120,6 +128,9 @@ const bookInSeriesField = useField<number | undefined>('bookInSeries');
 const tagsField = useField<string[]>('tags');
 const ratingField = useField<number | undefined>('rating');
 const pageCountField = useField<number | undefined>('pageCount');
+const notesField = useField<string>('notes');
+const readField = useField<boolean>('read', undefined, { initialValue: true });
+const wishlistField = useField<boolean>('wishlist');
 
 const onSubmit = form.handleSubmit(() => {
   const resp: BookContent = {
@@ -132,11 +143,14 @@ const onSubmit = form.handleSubmit(() => {
     bookInSeries: bookInSeriesField.value.value,
     tags: tagsField.value.value,
     rating: ratingField.value.value,
+    notes: notesField.value.value,
+    read: readField.value.value,
+    wishlist: wishlistField.value.value,
   };
 
   // Enforce undefined as default for blank
   Object.entries(resp).forEach(([key, value]) => {
-    (resp as any)[key] = value || undefined;
+    (resp as any)[key] = value ?? undefined;
   });
   modal.close(resp);
 });
@@ -167,6 +181,9 @@ onMounted(() => {
   tagsField.value.value = (content.tags || []).map(t => t);
   ratingField.value.value = content.rating;
   pageCountField.value.value = content.pageCount;
+  notesField.value.value = content.notes || '';
+  readField.value.value = content.read;
+  wishlistField.value.value = content.wishlist;
 });
 
 const onScan = async () => {

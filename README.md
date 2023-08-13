@@ -5,8 +5,9 @@
 
 
 ## Library
-- modal form for editing books
-- modal form for editing library (just a name)
+- add track reading functionality
+- add file upload feature (not sure how safe this is)
+    - no less safe than anything else I suppose
 
 
 ## Blob storage

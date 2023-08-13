@@ -20,6 +20,9 @@ export interface BookContent {
   bookInSeries?: number;
   tags?: string[];
   rating?: number;
+  notes?: string;
+  read: boolean;
+  wishlist: boolean;
 }
 
 export interface LibraryWithBooks {

@@ -14,11 +14,26 @@
             :src="book.content.coverImageUrl"
             height="250"
           />
+          <div class="icons">
+            <v-tooltip v-if="book.content.wishlist" location="top">
+              <template #activator="{ props }">
+                <v-icon v-bind="props">mdi-tag-heart-outline</v-icon>
+              </template>
+              Wishlist
+            </v-tooltip>
+
+            <v-tooltip v-if="book.content.read" location="top">
+              <template #activator="{ props }">
+                <v-icon v-bind="props">mdi-check</v-icon>
+              </template>
+              Read
+            </v-tooltip>
+          </div>
         </v-col>
         <v-col align-self="center">
           <v-text-field label="Title" variant="solo" readonly :model-value="book.content.title" />
           <v-text-field label="ISBN" readonly variant="solo" :model-value="book.content.isbn" />
-          <v-text-field label="Series (#No)" readonly varient="solo" :model-value="seriesText" />
+          <v-text-field label="Series (#No)" readonly variant="solo" :model-value="seriesText" />
           <v-combobox
             label="Authors"
             variant="solo"
@@ -55,6 +70,7 @@
         chips
         multiple
       />
+      <v-textarea label="Notes" variant="solo" readonly :model-value="book.content.notes" />
     </v-card>
   </BasePage>
 </template>
@@ -159,4 +175,9 @@ const onDelete = async () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.icons {
+  position: absolute;
+  top: 0.5rem;
+}
+</style>
