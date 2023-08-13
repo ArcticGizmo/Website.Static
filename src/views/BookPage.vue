@@ -94,8 +94,12 @@ const seriesText = computed(() => {
     return;
   }
   const { series, bookInSeries } = b.content;
-  if (!series || !bookInSeries) {
+  if (!series) {
     return '';
+  }
+
+  if (!bookInSeries) {
+    return series;
   }
 
   return `${series} #${bookInSeries}`;

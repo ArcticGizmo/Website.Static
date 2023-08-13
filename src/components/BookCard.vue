@@ -48,8 +48,12 @@ const props = defineProps<{ book: Book }>();
 
 const seriesText = computed(() => {
   const { series, bookInSeries } = props.book.content;
-  if (!series || !bookInSeries) {
+  if (!series) {
     return '';
+  }
+
+  if (!bookInSeries) {
+    return series;
   }
 
   return `${series} #${bookInSeries}`;
