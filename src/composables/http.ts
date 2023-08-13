@@ -43,6 +43,9 @@ const wretchClient = wretch()
       })
       .notFound(() => {
         toast.warning('404: Not Found');
+      })
+      .internalError(() => {
+        toast.error('500: Something went wrong with the server');
       }),
   );
 

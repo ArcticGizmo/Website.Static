@@ -24,8 +24,10 @@
         :error-messages="bookInSeriesField.errorMessage.value"
       />
       <v-text-field
+        class="hide-spin"
         label="ISBN"
         v-model="isbnField.value.value"
+        type="number"
         :counter="13"
         :error-messages="isbnField.errorMessage.value"
       />
@@ -200,3 +202,11 @@ const onScan = async () => {
   }
 };
 </script>
+
+<style scoped>
+:deep .hide-spin input::-webkit-outer-spin-button,
+:deep .hide-spin input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+</style>
