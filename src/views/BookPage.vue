@@ -1,70 +1,62 @@
 <template>
-  <v-container class="fill-height justify-center">
-    <v-responsive v-if="notFound" class="text-center">
-      <h2 class="mb-4">Where'd it go??</h2>
-      <p>We could not find the book you were looking for</p>
-      <p>... sorry about that</p>
-      <v-btn class="mt-4" color="primary" @click="router.back()">Back</v-btn>
-    </v-responsive>
-    <v-responsive v-else-if="book" class="text-center fill-height" max-width="750px">
-      <v-row class="ma-1 mb-4">
-        <v-btn size="small" icon="mdi-arrow-left" @click="onBack()" />
-        <v-spacer />
-        <v-btn color="primary" @click="onEdit">Edit</v-btn>
-        <v-btn color="error" @click="onDelete">Delete</v-btn>
-      </v-row>
-      <v-card v-if="book" class="pa-4" border rounded elevation="4">
-        <v-row>
-          <v-col cols="4">
-            <ImageWithPlaceholder
-              class="fill-height"
-              :src="book.content.coverImageUrl"
-              height="250"
-            />
-          </v-col>
-          <v-col align-self="center">
-            <v-text-field label="Title" variant="solo" readonly :model-value="book.content.title" />
-            <v-text-field label="ISBN" readonly variant="solo" :model-value="book.content.isbn" />
-            <v-text-field label="Series (#No)" readonly varient="solo" :model-value="seriesText" />
-            <v-combobox
-              label="Authors"
-              variant="solo"
-              readonly
-              :model-value="book.content.authors"
-              chips
-              multiple
-            />
+  <BasePage max-width="750px" :not-found="notFound" :loading="isLoading">
+    <v-row class="ma-1 mb-4">
+      <v-btn size="small" icon="mdi-arrow-left" @click="onBack()" />
+      <v-spacer />
+      <v-btn color="primary" @click="onEdit">Edit</v-btn>
+      <v-btn color="error" @click="onDelete">Delete</v-btn>
+    </v-row>
+    <v-card v-if="book" class="pa-4" border rounded elevation="4">
+      <v-row>
+        <v-col cols="4">
+          <ImageWithPlaceholder
+            class="fill-height"
+            :src="book.content.coverImageUrl"
+            height="250"
+          />
+        </v-col>
+        <v-col align-self="center">
+          <v-text-field label="Title" variant="solo" readonly :model-value="book.content.title" />
+          <v-text-field label="ISBN" readonly variant="solo" :model-value="book.content.isbn" />
+          <v-text-field label="Series (#No)" readonly varient="solo" :model-value="seriesText" />
+          <v-combobox
+            label="Authors"
+            variant="solo"
+            readonly
+            :model-value="book.content.authors"
+            chips
+            multiple
+          />
 
-            <v-text-field
-              label="Pages"
-              readonly
-              variant="solo"
-              :model-value="book.content.pageCount"
-            />
-          </v-col>
-        </v-row>
-        <v-rating
-          class="text-center"
-          label="Rating"
-          readonly
-          :model-value="book.content.rating"
-          length="5"
-          half-increments
-          size="x-large"
-          color="grey"
-          active-color="orange"
-        />
-        <v-combobox
-          label="Tags"
-          variant="solo"
-          readonly
-          :model-value="book.content.tags"
-          chips
-          multiple
-        />
-      </v-card>
-    </v-responsive>
-  </v-container>
+          <v-text-field
+            label="Pages"
+            readonly
+            variant="solo"
+            :model-value="book.content.pageCount"
+          />
+        </v-col>
+      </v-row>
+      <v-rating
+        class="text-center"
+        label="Rating"
+        readonly
+        :model-value="book.content.rating"
+        length="5"
+        half-increments
+        size="x-large"
+        color="grey"
+        active-color="orange"
+      />
+      <v-combobox
+        label="Tags"
+        variant="solo"
+        readonly
+        :model-value="book.content.tags"
+        chips
+        multiple
+      />
+    </v-card>
+  </BasePage>
 </template>
 
 <script lang="ts" setup>
@@ -78,11 +70,13 @@ import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import BookFormModal from '@/modals/BookFormModal.vue';
 import { useModalController } from '@/composables/modal';
 import { computed } from 'vue';
+import BasePage from './BasePage.vue';
 
 const props = defineProps<{ bookId: string }>();
 
 const book = ref<Book>();
 const notFound = ref(false);
+const isLoading = ref(false);
 
 const { http } = useHttp();
 const dialogController = useDialog();
@@ -110,11 +104,18 @@ onMounted(() => {
 });
 
 const fetchBook = async () => {
+  isLoading.value = true;
   notFound.value = false;
-  book.value = await http('book/')
-    .get(props.bookId)
-    .notFound(() => (notFound.value = true))
-    .json<Book>();
+
+  try {
+    book.value = await http('book/')
+      .get(props.bookId)
+      .notFound(() => (notFound.value = true))
+      .json<Book>();
+  } finally {
+    notFound.value = false;
+    isLoading.value = false;
+  }
 };
 
 const onBack = () => router.back();
