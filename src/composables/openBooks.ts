@@ -9,7 +9,7 @@ interface BookRespContent {
   title: string;
   authors: Author[];
   number_of_pages?: number;
-  subjects: SubjectLink[];
+  subjects?: SubjectLink[];
   cover?: BookCover;
 }
 
@@ -67,7 +67,7 @@ const toBookContent = (book: BookRespContent): OpenBookContent => {
 };
 
 const extractSeries = (book: BookRespContent) => {
-  const match = book.subjects.find(s => s.name.startsWith('series:'));
+  const match = (book.subjects || []).find(s => s.name.startsWith('series:'));
   if (!match) {
     return;
   }
