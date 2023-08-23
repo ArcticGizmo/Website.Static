@@ -25,11 +25,6 @@ export interface BookContent {
   wishlist: boolean;
 }
 
-export interface LibraryWithBooks {
-  library: Library;
-  books: Book[];
-}
-
 export interface CreateBookReq {
   libraryId: string;
   content: BookContent;

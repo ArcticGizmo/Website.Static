@@ -64,7 +64,7 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/library/:libraryId',
+    path: '/libraries/:libraryId',
     name: 'Library',
     props: true,
     component: () => import(/* webpackChunkName: "library" */ '@/views/LibraryPage.vue'),

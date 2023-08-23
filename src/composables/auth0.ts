@@ -4,6 +4,7 @@ const scopes = [
   'openid',
   'profile',
   'email',
+  'offline_access',
   // users and IAM
   'manage:users',
   // library
