@@ -15,7 +15,7 @@
       <p>{{ profile.roles.join(', ') }}</p>
     </template>
     <br />
-    <v-btn color="primary" @click="logout">Logout</v-btn>
+    <v-btn color="primary" @click="logout()">Logout</v-btn>
   </v-container>
 </template>
 

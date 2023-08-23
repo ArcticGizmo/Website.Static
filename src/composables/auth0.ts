@@ -20,6 +20,7 @@ export const Auth0Client = createAuth0({
     audience: import.meta.env['VITE_AUTH0__AUDIENCE'],
     organization: import.meta.env['VITE_AUTH0__ORG_ID'],
     scope: scopes.join(' '),
+    prompt: 'select_account',
   },
 });
 

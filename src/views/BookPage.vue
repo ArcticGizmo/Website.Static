@@ -124,7 +124,7 @@ const fetchBook = async () => {
   notFound.value = false;
 
   try {
-    book.value = await http('book/')
+    book.value = await http('books/')
       .get(props.bookId)
       .notFound(() => (notFound.value = true))
       .json<Book>();
@@ -151,7 +151,7 @@ const onEdit = async () => {
     return;
   }
 
-  await http(`book/${props.bookId}`).put(updatedContent).res();
+  await http(`books/${props.bookId}`).put(updatedContent).res();
   await fetchBook();
 };
 
@@ -167,7 +167,7 @@ const onDelete = async () => {
     return;
   }
 
-  const deleteResp = await http(`book/${props.bookId}`).delete().res();
+  const deleteResp = await http(`books/${props.bookId}`).delete().res();
 
   if (deleteResp.ok) {
     router.back();
