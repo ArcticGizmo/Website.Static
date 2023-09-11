@@ -20,6 +20,7 @@
     "vue": "^3.2.0",
     "vue-router": "^4.0.0",
     "vue-toast-notification": "^3.1.1",
+    "vuedraggable": "^4.1.0",
     "vuetify": "^3.3.0",
     "webfontloader": "^1.0.0",
     "wretch": "^2.6.0",

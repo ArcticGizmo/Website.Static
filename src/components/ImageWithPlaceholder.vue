@@ -4,7 +4,12 @@
       <v-icon :size="iconSize" class="fill-height w-100" color="grey"> {{ fallbackIcon }}</v-icon>
     </template>
     <template #error>
-      <v-icon :size="iconSize" class="fill-height w-100" color="grey">
+      <v-icon
+        title="appears to be broken ..."
+        :size="iconSize"
+        class="fill-height w-100"
+        color="grey"
+      >
         {{ errorIcon || fallbackIcon }}
       </v-icon>
     </template>

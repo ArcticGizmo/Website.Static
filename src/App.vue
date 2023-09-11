@@ -1,6 +1,6 @@
 <template>
   <ModalProvider>
-    <v-dialog :model-value="!serverAlive" persistent>
+    <v-dialog :model-value="ready && !serverAlive" persistent>
       <v-container class="d-flex justify-center">
         <v-card class="pa-4 w-100 text-center" max-width="500px">
           <h3>Waiting for the server to wake up</h3>
@@ -17,28 +17,35 @@
 import DefaultLayout from '@/layouts/default/Default.vue';
 import ModalProvider from './components/ModalProvider.vue';
 
-import { useAnonymousHttp } from '@/composables/http';
+import { useSimpleHttp } from '@/composables/http';
 import { ref } from 'vue';
+import { onMounted } from 'vue';
 
+const READY_AFTER_MS = 2_000;
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+const CHECK_AFTER_FAILURE = 15_000;
 
-const { http } = useAnonymousHttp();
+const { http } = useSimpleHttp();
 
-const serverAlive = ref(true);
+const ready = ref(false);
+
+const serverAlive = ref(false);
 
 const checkStatus = async () => {
   try {
-    const resp = await http('healthz').get().res();
+    const resp = await http('status').get().res();
     serverAlive.value = resp.ok;
     setTimeout(() => checkStatus(), CHECK_INTERVAL_MS);
   } catch (error) {
     console.error(error);
     serverAlive.value = false;
-    setTimeout(() => checkStatus(), 30_000);
+    setTimeout(() => checkStatus(), CHECK_AFTER_FAILURE);
   }
 };
 
-if (!import.meta.env.DEV) {
-  checkStatus();
-}
+onMounted(() => {
+  setTimeout(() => (ready.value = true), READY_AFTER_MS);
+});
+
+checkStatus();
 </script>

@@ -80,12 +80,10 @@ import { useHttp } from '@/composables/http';
 import { useDialog } from '@/composables/dialog';
 import router from '@/router';
 import { Book, BookContent } from '@/types/library';
-import { onMounted } from 'vue';
-import { ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import BookFormModal from '@/modals/BookFormModal.vue';
 import { useModalController } from '@/composables/modal';
-import { computed } from 'vue';
 import BasePage from './BasePage.vue';
 
 const props = defineProps<{ bookId: string }>();
@@ -151,7 +149,7 @@ const onEdit = async () => {
     return;
   }
 
-  await http(`books/${props.bookId}`).put(updatedContent).res();
+  await http(`books/${props.bookId}`).put(updatedContent.value).res();
   await fetchBook();
 };
 

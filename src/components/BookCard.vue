@@ -33,7 +33,7 @@
         </p>
         <div class="tags py-1">
           <v-chip
-            v-for="(tag, index) in book.content.tags || ['apple']"
+            v-for="(tag, index) in book.content.tags || []"
             color="blue"
             size="small"
             :key="index"

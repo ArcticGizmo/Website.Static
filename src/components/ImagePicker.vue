@@ -1,108 +1,109 @@
 <template>
-  <v-row class="my-4">
-    <v-col>
-      <ImageWithPlaceholder
-        :width="width"
-        :height="height"
-        :src="modelValue"
-        :fallback-icon="fallbackIcon"
-        error-icon="mdi-image-broken"
-        @error="onImageError"
-      />
-    </v-col>
-    <v-col>
-      <v-text-field
-        :model-value="modelValue"
-        label="Image Url"
-        :error-messages="errorMessage"
-        @input="errorMessage = undefined"
-        @change="onUrlChange"
-      />
-      <!-- hidden and triggered by the file button instead -->
-      <v-file-input ref="fileInput" v-show="false" v-model="fileValue" accept="image/*" />
-      <v-file-input
-        ref="cameraInput"
-        v-show="false"
-        v-model="fileValue"
-        capture="environment"
-        accept="image/*"
-      />
-      <v-btn block @click="onUploadFile"> Upload File<v-icon>mdi-file</v-icon> </v-btn>
-      <br />
-      <v-btn block @click="onTakePicture"> Take Picture<v-icon>mdi-camera</v-icon> </v-btn>
-    </v-col>
-  </v-row>
+  <v-card
+    class="container p-relative"
+    elevation="0"
+    :height="height"
+    :width="width"
+    @click="onClick"
+  >
+    <ImageWithPlaceholder
+      :title="!modelValue ? 'Add Image' : ''"
+      class="dashed-border"
+      :width="width"
+      :height="height"
+      :src="modelValue"
+      :fallback-icon="fallbackIcon"
+      error-icon="mdi-image-broken"
+      @error="onImageError"
+    />
+    <div v-if="!noIcons" class="actions p-absolute ma-4">
+      <v-btn size="x-small" icon @click.stop="onClick">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn class="ml-2" size="x-small" icon @click.stop="onClear">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
+    </div>
+  </v-card>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import ImageWithPlaceholder from './ImageWithPlaceholder.vue';
-import { watch } from 'vue';
-
-interface ChangeEvent {
-  target: { value?: string };
-}
+import { useModalController } from '@/composables/modal';
+import ImagePickerModal from '@/modals/ImagePickerModal.vue';
 
 const props = defineProps({
   modelValue: String,
-  fallbackIcon: String,
+  fallbackIcon: { type: String, default: 'mdi-image-plus' },
   height: String,
   width: String,
   maxFileSize: { type: Number, default: 10_000_000 },
+  noIcons: Boolean,
 });
 
 const emits = defineEmits<{
   'update:model-value': [value: string | undefined];
+  cleared: [];
+  changed: [value: string | undefined];
 }>();
 
-const fileInput = ref();
-const cameraInput = ref();
-const fileValue = ref();
+const modalController = useModalController();
+
 const errorMessage = ref<string>();
-
-const onUploadFile = () => {
-  fileInput.value.click();
-};
-
-const onTakePicture = () => {
-  cameraInput.value.click();
-};
-
-const onUrlChange = (event: ChangeEvent) => {
-  const url = event.target.value;
-  emits('update:model-value', url);
-};
 
 const onImageError = () => {
   errorMessage.value = 'Something is wrong with the image!';
 };
 
-watch(fileValue, async value => {
-  errorMessage.value = undefined;
-  const img: File = value[0];
-  if (!img) {
-    return;
-  }
-
-  if (img.size > props.maxFileSize) {
-    errorMessage.value = 'File too large!';
-    return;
-  }
-
-  try {
-    const url = await getBase64(img);
-    emits('update:model-value', url);
-  } catch (error) {
-    errorMessage.value = 'Unable to convert image';
-  }
-});
-
-const getBase64 = (file: File): Promise<string | undefined> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result?.toString());
-    reader.onerror = error => reject(error);
+const onClick = async () => {
+  const result = await modalController.show<string>({
+    component: ImagePickerModal,
+    props: {
+      modelValue: props.modelValue,
+      fallbackIcon: props.fallbackIcon,
+      maxFileSize: props.maxFileSize,
+    },
+    options: { maxWidth: '500px' },
   });
+
+  if (!result) {
+    return;
+  }
+
+  emits('update:model-value', result.value);
+
+  if (result.value !== props.modelValue) {
+    emits('changed', result.value);
+  }
+
+  if (!result.value && !!props.modelValue) {
+    emits('cleared');
+  }
+};
+
+const onClear = () => {
+  console.dir('cleared');
+  emits('cleared');
+  emits('update:model-value', undefined);
 };
 </script>
+
+<style scoped>
+.p-relative {
+  position: relative;
+  /* display: inline-block; */
+}
+
+.p-absolute {
+  position: absolute;
+}
+.actions {
+  top: 0;
+  right: 0;
+}
+
+.dashed-border {
+  border: 1px dashed gray;
+}
+</style>

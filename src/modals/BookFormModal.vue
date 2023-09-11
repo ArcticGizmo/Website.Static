@@ -188,14 +188,16 @@ onMounted(() => {
 
 const onScan = async () => {
   try {
-    const isbn = await modalController.show<string>({
+    const resp = await modalController.show<string>({
       component: BarcodeScannerModal,
       options: { maxWidth: '500px' },
     });
 
-    if (!isbn) {
+    if (!resp || !resp.value) {
       return;
     }
+
+    const isbn = resp.value;
 
     modalController.showLoading({ message: 'Looking up your book now' });
     const book = await fetchBook(isbn);

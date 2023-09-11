@@ -11,11 +11,13 @@ interface ConfirmCancelOptions {
 const modalController = useModalController();
 
 const confirmCancel = async (options: ConfirmCancelOptions) => {
-  return await modalController.show<'confirm' | 'cancel'>({
+  const result = await modalController.show<'confirm' | 'cancel'>({
     component: ConfirmCancelModal,
     options: { persistent: true, maxWidth: '500px' },
     props: options,
   });
+
+  return result?.value;
 };
 
 export const useDialog = () => {
