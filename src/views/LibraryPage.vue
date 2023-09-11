@@ -141,15 +141,15 @@ const debouncedFetchLibrary = debounce(() => fetchBooks(), 500);
 const debouncedLoadMore = debounce(() => loadMore(), 500);
 
 const onCreate = async () => {
-  const content = await modalController.show<BookContent>({
+  const result = await modalController.show<BookContent>({
     component: BookFormModal,
     options: { persistent: false, maxWidth: '750px' },
   });
-  if (!content) {
+  if (!result || !result.value) {
     return;
   }
 
-  const req: CreateBookReq = { libraryId: props.libraryId, content };
+  const req: CreateBookReq = { libraryId: props.libraryId, content: result.value };
 
   await http('book').post(req).res();
   await fetchBooks();

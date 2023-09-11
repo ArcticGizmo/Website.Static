@@ -82,6 +82,25 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/recipes',
+    name: 'Recipes',
+    component: () => import(/* webpackChunkName: "recipes" */ '@/views/RecipesPage.vue'),
+    meta: {
+      title: 'Recipes',
+      icon: 'mdi-chef-hat',
+      secure: true,
+    },
+  },
+  {
+    path: '/recipes/:recipeId',
+    name: 'Recipe',
+    props: true,
+    component: () => import(/* webpackChunkName: "recipe" */ '@/views/RecipePage.vue'),
+    meta: {
+      secure: true,
+    },
+  },
+  {
     path: '/security',
     name: 'Security',
     component: () => import(/* webpackChunkName: "security" */ '@/views/SecurityPage.vue'),

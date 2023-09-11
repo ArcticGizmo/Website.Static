@@ -66,31 +66,31 @@ const fetchLibraries = async () => {
 };
 
 const onCreateLibrary = async () => {
-  const lib = await modalController.show<Library>({
+  const result = await modalController.show<Library>({
     component: LibraryFormModal,
     options: { persistent: false, maxWidth: '750px' },
   });
 
-  if (!lib) {
+  if (!result) {
     return;
   }
 
-  await http('library').post(lib).res();
+  await http('library').post(result.value).res();
   await fetchLibraries();
 };
 
 const onEdit = async (library: Library) => {
-  const updatedLib = await modalController.show<Library>({
+  const result = await modalController.show<Library>({
     component: LibraryFormModal,
     options: { persistent: false, maxWidth: '750px' },
     props: { library },
   });
 
-  if (!updatedLib) {
+  if (!result) {
     return;
   }
 
-  await http(`library/${library.id}`).put(updatedLib).res();
+  await http(`library/${library.id}`).put(result.value).res();
   await fetchLibraries();
 };
 

@@ -25,8 +25,12 @@ type ModalConfig<C extends Component> = {
 export interface Modal<T extends Component, K> extends ModalConfig<T> {
   modalId: Readonly<number>;
   show: Ref<boolean>;
-  promise: DefferablePromise<K>;
+  promise: DefferablePromise<ModalResp<K>>;
   destroy: () => void;
+}
+
+interface ModalResp<T> {
+  value: T;
 }
 
 interface ShowLoadingOptions {
@@ -50,7 +54,7 @@ const createModal = <T extends Component, K>(config: ModalConfig<T>): Modal<T, K
   (props as any).__modalId = modalId;
 
   const show = ref(true);
-  const promise = DeferredPromise<K>();
+  const promise = DeferredPromise<ModalResp<K>>();
 
   watch(show, isShowing => {
     if (!isShowing) {
@@ -102,10 +106,10 @@ export const useModal = () => {
   const instance = getCurrentInstance()!;
   const modalId = instance.attrs.__modalId as number;
   const modal = MODAL_LOOKUP.value[modalId];
-  const close = async (resp: any) => {
+  const close = async (resp?: any) => {
     // Not sure why it is not a ref, but it is
     (modal.show as any) = false;
-    modal.promise.resolve(resp);
+    modal.promise.resolve({ value: resp });
   };
   return { close };
 };
