@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-6">
+  <v-card class="pa-6 ma-4">
     <v-card-title class="text-h5">{{ isEdit ? 'Edit' : 'Create' }} Recipe</v-card-title>
     <form @submit.prevent="onSubmit">
       <v-text-field
@@ -72,11 +72,13 @@
               <template #prepend>
                 <v-icon class="handle ma-auto" size="x-large">mdi-menu</v-icon>
               </template>
-              <v-text-field
+              <v-textarea
                 :name="`step[${field.key}]`"
                 v-model="field.value.text"
                 :counter="1024"
                 placeholder="next step"
+                auto-grow
+                tabindex="-1"
                 :error-messages="stepsArrayField.errors.value[field.key]"
               >
                 <template #append>
@@ -84,7 +86,7 @@
                     mdi-delete
                   </v-icon>
                 </template>
-              </v-text-field>
+              </v-textarea>
               <div class="d-flex">
                 <ImagePicker
                   class="ma-1"

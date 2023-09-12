@@ -42,7 +42,7 @@
 
       <div class="ma-3" v-for="(step, index) in recipe.content.steps" :key="index">
         <h4>Step {{ index + 1 }}</h4>
-        <p>{{ step.text }}</p>
+        <v-textarea v-model="step.text" readonly variant="solo" auto-grow />
         <div class="d-inline-flex">
           <ImageWithViewer
             class="mx-1"
