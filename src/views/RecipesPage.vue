@@ -1,5 +1,5 @@
 <template>
-  <BasePage :not-found="notFound" :loading="initialLoad">
+  <BasePage :not-found="notFound" :loading="isLoading">
     <v-text-field
       class="mb-2"
       v-model="searchText"
@@ -8,13 +8,18 @@
       single-line
       hide-details
       clearable
-      @input="debounceFetchRecipes()"
-      @click:clear="debounceFetchRecipes()"
     >
+      <!-- @input="debounceFetchRecipes()"
+      @click:clear="debounceFetchRecipes()" -->
       <template #append>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
       </template>
     </v-text-field>
+    <!-- <pre class="text-left">
+      {{ a.data }}
+    </pre> -->
+    {{ hasNextPage }}
+    <v-btn :disabled="!hasNextPage" @click="fetchNextPage()">Next</v-btn>
     <v-lazy>
       <transition-group disabled="false">
         <recipe-card
@@ -32,65 +37,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import BasePage from './BasePage.vue';
 import { useHttp } from '@/composables/http';
 import { useModalController } from '@/composables/modal';
-import type { Recipe, RecipeContent } from '@/types/recipe';
-import { debounce } from '@/util/debounce';
+import type { RecipeContent } from '@/types/recipe';
 import RecipeCard from '@/components/RecipeCard.vue';
 import router from '@/router';
 import RecipeFormModal from '@/modals/RecipeFormModal.vue';
-
-const PAGE_SIZE = 25;
+import { useRecipes } from '@/composables/api/recipes';
 
 const { http } = useHttp();
 const modalController = useModalController();
 
 const notFound = ref(false);
-const initialLoad = ref(true);
 const isLoadingMore = ref(false);
 const noMore = ref(false);
-const pageNumber = ref(0);
 const searchText = ref<string>();
 
-const recipes = ref<Recipe[]>([]);
+const { recipes, refetch, fetchNextPage, hasNextPage, isLoading } = useRecipes(searchText);
 
-onMounted(async () => {
-  await fetchRecipes();
-  initialLoad.value = false;
-});
+// onMounted(async () => {
+//   await fetchRecipes();
+//   initialLoad.value = false;
+// });
 
-const fetchRecipes = async () => {
-  pageNumber.value = 0;
+// const fetchRecipes = async () => {
+//   pageNumber.value = 0;
 
-  isLoadingMore.value = false;
-  notFound.value = false;
-  noMore.value = false;
+//   isLoadingMore.value = false;
+//   notFound.value = false;
+//   noMore.value = false;
 
-  const query = {
-    searchText: searchText.value || undefined,
-    pageNumber: pageNumber.value,
-    pageSize: PAGE_SIZE,
-  };
+//   const query = {
+//     searchText: searchText.value || undefined,
+//     pageNumber: pageNumber.value,
+//     pageSize: PAGE_SIZE,
+//   };
 
-  try {
-    recipes.value = await http(`recipes`)
-      .query(query)
-      .get()
-      .notFound(() => (notFound.value = true))
-      .json<Recipe[]>();
+//   try {
+//     recipes.value = await http(`recipes`)
+//       .query(query)
+//       .get()
+//       .notFound(() => (notFound.value = true))
+//       .json<Recipe[]>();
 
-    if (recipes.value.length < query.pageSize) {
-      noMore.value = true;
-    }
-  } finally {
-    isLoadingMore.value = false;
-    notFound.value = false;
-  }
-};
+//     if (recipes.value.length < query.pageSize) {
+//       noMore.value = true;
+//     }
+//   } finally {
+//     isLoadingMore.value = false;
+//     notFound.value = false;
+//   }
+// };
 
-const debounceFetchRecipes = debounce(() => fetchRecipes(), 500);
+// const debounceFetchRecipes = debounce(() => fetchRecipes(), 500);
 
 // const debouncedLoadMore = debounce(() => loadMore(), 500);
 
@@ -104,7 +105,7 @@ const onCreate = async () => {
   }
 
   await http('recipes').post(result.value).res();
-  await fetchRecipes();
+  await refetch();
 };
 
 const onSelect = (recipeId?: string) => {
