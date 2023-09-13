@@ -1,8 +1,6 @@
 <template>
-  <v-responsive style="margin: auto">
-    <v-card class="text-center" width="80vh" height="80vh">
-      <ImageWithPlaceholder :src="src" />
-    </v-card>
+  <v-responsive class="ma-auto">
+    <ImageWithPlaceholder :src="src" width="80vw" height="80vh" />
     <v-overlay persistent :model-value="true" scrim="transparent" @click="modal.close()" />
   </v-responsive>
 </template>
