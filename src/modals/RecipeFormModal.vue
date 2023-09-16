@@ -179,7 +179,7 @@ const ingredientsArrayField = useArrayField<string>('ingredients');
 const stepsArrayField = useArrayField<RecipeStep>('steps');
 
 const onSubmit = form.handleSubmit(async () => {
-  const resp: RecipeContent = {
+  const req: RecipeContent = {
     name: nameField.value.value,
     imageUrl: imageUrlField.value.value,
     time: timeField.value.value,
@@ -190,16 +190,16 @@ const onSubmit = form.handleSubmit(async () => {
   };
 
   // Enforce undefined as default for blank
-  Object.entries(resp).forEach(([key, value]) => {
-    (resp as any)[key] = value ?? undefined;
+  Object.entries(req).forEach(([key, value]) => {
+    (req as any)[key] = value ?? undefined;
   });
 
   if (isEdit.value) {
-    modalController.showLoading({ title: 'Creating Recipe' });
-    await submitUpdate(resp);
-  } else {
     modalController.showLoading({ title: 'Updating Recipe' });
-    await submitCreate(resp);
+    await submitUpdate(req);
+  } else {
+    modalController.showLoading({ title: 'Creating Recipe' });
+    await submitCreate(req);
   }
 
   modalController.hideLoading();

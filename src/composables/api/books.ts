@@ -1,17 +1,17 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/vue-query';
 import { useHttp } from '../http';
-import { Recipe, RecipeContent } from '@/types/recipe';
+import { Book, BookContent } from '@/types/library';
 import { MaybeRef, Ref, computed, reactive, unref } from 'vue';
 import { PagedData } from '@/types/api';
 import { debounce } from '@/util/debounce';
 
 const PAGE_SIZE = 5;
 
-export const useRecipes = (searchText: Ref<string | undefined>) => {
+export const useBooks = (libraryId: MaybeRef<string>, searchText: Ref<string | undefined>) => {
   const { http } = useHttp();
 
   const state = useInfiniteQuery({
-    queryKey: ['recipes', searchText],
+    queryKey: ['books', libraryId, searchText],
 
     queryFn: async data => {
       const query = {
@@ -19,7 +19,10 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
         pageNumber: data.pageParam?.[0] || 0,
         pageSize: data.pageParam?.[1] || PAGE_SIZE,
       };
-      return await http('recipes').query(query).get().json<PagedData<Recipe>>();
+      return await http(`libraries/${unref(libraryId)}/books`)
+        .query(query)
+        .get()
+        .json<PagedData<Book>>();
     },
     getNextPageParam: lastPage => {
       if (lastPage?.nextPage == null) {
@@ -34,57 +37,59 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
 
   const refetchDebounced = debounce(state.refetch, 500);
 
-  const recipes = computed(() => {
+  const books = computed(() => {
     const pages = state.data.value?.pages || [];
     return pages.flatMap(d => d.data);
   });
 
-  return { recipes, getRecipes: reactive({ fetchNextPageDebounced, refetchDebounced, ...state }) };
+  return { books, getBooks: reactive({ fetchNextPageDebounced, refetchDebounced, ...state }) };
 };
 
-export const useRecipe = (id: MaybeRef<string>) => {
+export const useBook = (id: MaybeRef<string>) => {
   const { http } = useHttp();
 
   const state = useQuery({
-    queryKey: ['recipe', id],
-    queryFn: () => http('recipes/').get(unref(id)).json<Recipe>(),
+    queryKey: ['book', id],
+    queryFn: () => http('books/').get(unref(id)).json<Book>(),
   });
 
-  return { recipe: state.data, getRecipe: state };
+  return { book: state.data, getBook: reactive(state) };
 };
 
-export const useCreateRecipe = () => {
+export const useCreateBook = (libraryId: MaybeRef<string>) => {
   const { http } = useHttp();
 
   const mutation = useMutation({
-    mutationFn: (content: RecipeContent) => {
-      return http('recipes').post(content).res();
+    mutationFn: (content: BookContent) => {
+      return http('books')
+        .post({ libraryId: unref(libraryId), content })
+        .res();
     },
   });
 
-  return { createRecipe: mutation };
+  return { createBook: mutation };
 };
 
-export const useUpdateRecipe = () => {
+export const useUpdateBook = () => {
   const { http } = useHttp();
 
   const mutation = useMutation({
-    mutationFn: (req: { id: string; content: RecipeContent }) => {
-      return http(`recipes/${req.id}`).put(req.content).res();
+    mutationFn: (req: { id: string; content: BookContent }) => {
+      return http(`books/${req.id}`).put(req.content).res();
     },
   });
 
-  return { updateRecipe: mutation };
+  return { updateBook: mutation };
 };
 
-export const useDeleteRecipe = () => {
+export const useDeleteBook = () => {
   const { http } = useHttp();
 
   const mutation = useMutation({
     mutationFn: (id: string) => {
-      return http(`recipes/${id}`).delete().res();
+      return http(`books/${id}`).delete().res();
     },
   });
 
-  return { deleteRecipe: mutation };
+  return { deleteBook: mutation };
 };

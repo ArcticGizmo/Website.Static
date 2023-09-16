@@ -83,7 +83,6 @@ const onClick = async () => {
 };
 
 const onClear = () => {
-  console.dir('cleared');
   emits('cleared');
   emits('update:model-value', undefined);
 };

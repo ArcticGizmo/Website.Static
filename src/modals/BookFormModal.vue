@@ -96,6 +96,20 @@ import { useOpenBooks } from '@/composables/openBooks';
 import { useToast } from 'vue-toast-notification';
 import { useField, useForm } from 'vee-validate';
 import * as yup from 'yup';
+import { useCreateBook, useUpdateBook } from '@/composables/api/books';
+
+const props = defineProps<{ id?: string; libraryId?: string; content?: BookContent }>();
+
+const modal = useModal();
+const toast = useToast();
+const modalController = useModalController();
+
+const { fetchBook } = useOpenBooks();
+
+const { createBook } = useCreateBook(props.libraryId!);
+const { updateBook } = useUpdateBook();
+
+const isEdit = computed(() => !!props.id);
 
 const schema = yup.object({
   title: yup.string().required(),
@@ -132,8 +146,8 @@ const notesField = useField<string>('notes');
 const readField = useField<boolean>('read', undefined, { initialValue: true });
 const wishlistField = useField<boolean>('wishlist');
 
-const onSubmit = form.handleSubmit(() => {
-  const resp: BookContent = {
+const onSubmit = form.handleSubmit(async () => {
+  const req: BookContent = {
     isbn: isbnField.value.value,
     title: titleField.value.value,
     authors: authorsField.value.value || [],
@@ -149,22 +163,49 @@ const onSubmit = form.handleSubmit(() => {
   };
 
   // Enforce undefined as default for blank
-  Object.entries(resp).forEach(([key, value]) => {
-    (resp as any)[key] = value ?? undefined;
+  Object.entries(req).forEach(([key, value]) => {
+    (req as any)[key] = value ?? undefined;
   });
-  modal.close(resp);
+
+  if (isEdit.value) {
+    modalController.showLoading({ title: 'Updating Book' });
+    await submitUpdate(req);
+  } else {
+    modalController.showLoading({ title: 'Creating Book' });
+    await submitCreate(req);
+  }
+
+  modalController.hideLoading();
 });
 
+const submitUpdate = async (content: BookContent) => {
+  await updateBook.mutateAsync(
+    { id: props.id!, content },
+    {
+      onSuccess: () => {
+        toast.success('Book Updated')!;
+        modal.close('updated');
+      },
+      onError: () => {
+        toast.error('Unable to update book at this time', { duration: 3000 });
+      },
+    },
+  );
+};
+
+const submitCreate = async (content: BookContent) => {
+  await createBook.mutateAsync(content, {
+    onSuccess: () => {
+      toast.success('Book Created')!;
+      modal.close('created');
+    },
+    onError: () => {
+      toast.error('Unable to create book at this time', { duration: 3000 });
+    },
+  });
+};
+
 // ----------------
-
-const props = defineProps<{ content?: BookContent }>();
-
-const modal = useModal();
-const modalController = useModalController();
-const { fetchBook } = useOpenBooks();
-const toast = useToast();
-
-const isEdit = computed(() => !!props.content);
 
 onMounted(() => {
   const content = props.content;

@@ -95,7 +95,7 @@ const onEdit = async () => {
   const result = await modalController.show<'updated'>({
     component: RecipeFormModal,
     options: { persistent: false, maxWidth: '750px' },
-    props: { content },
+    props: { id: props.recipeId, content },
   });
 
   if (result?.value === 'updated') {

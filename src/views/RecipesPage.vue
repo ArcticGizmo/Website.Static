@@ -1,5 +1,5 @@
 <template>
-  <BasePage :not-found="notFound" :loading="isInitialLoading">
+  <BasePage :loading="getRecipes.isInitialLoading">
     <v-text-field
       class="mb-2"
       v-model="searchText"
@@ -8,8 +8,8 @@
       single-line
       hide-details
       clearable
-      @input="fetchNextPageDebounced()"
-      @click:clear="fetchNextPageDebounced()"
+      @input="getRecipes.refetch()"
+      @click:clear="getRecipes.refetchDebounced()"
     >
       <template #append>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
@@ -17,9 +17,9 @@
     </v-text-field>
     <CardList
       :items="recipes"
-      :has-more="hasNextPage"
-      :is-loading="isLoading"
-      @load-more="fetchNextPageDebounced()"
+      :has-more="getRecipes.hasNextPage"
+      :is-loading="getRecipes.isLoading"
+      @load-more="getRecipes.fetchNextPageDebounced()"
     >
       <template #item="{ item }">
         <recipe-card :recipe="item" @click="onSelect(item.id)" />
@@ -40,11 +40,9 @@ import CardList from '@/components/CardList.vue';
 
 const modalController = useModalController();
 
-const notFound = ref(false);
 const searchText = ref<string>();
 
-const { recipes, refetch, fetchNextPageDebounced, hasNextPage, isLoading, isInitialLoading } =
-  useRecipes(searchText);
+const { recipes, getRecipes } = useRecipes(searchText);
 
 const onCreate = async () => {
   const resp = await modalController.show<'created'>({
@@ -53,7 +51,7 @@ const onCreate = async () => {
   });
 
   if (resp?.value === 'created') {
-    refetch();
+    await getRecipes.refetch();
   }
 };
 
