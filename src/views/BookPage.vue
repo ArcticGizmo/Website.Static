@@ -1,5 +1,5 @@
 <template>
-  <BasePage max-width="750px" :not-found="notFound" :loading="isLoading">
+  <BasePage max-width="750px" :loading="getBook.isLoading">
     <v-row class="ma-1 mb-4">
       <v-btn size="small" icon="mdi-arrow-left" @click="onBack()" />
       <v-spacer />
@@ -76,25 +76,21 @@
 </template>
 
 <script lang="ts" setup>
-import { useHttp } from '@/composables/http';
 import { useDialog } from '@/composables/dialog';
 import router from '@/router';
-import { Book, BookContent } from '@/types/library';
-import { onMounted, ref, computed } from 'vue';
+import { computed } from 'vue';
 import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import BookFormModal from '@/modals/BookFormModal.vue';
 import { useModalController } from '@/composables/modal';
 import BasePage from './BasePage.vue';
+import { useBook, useDeleteBook } from '@/composables/api/books';
 
 const props = defineProps<{ bookId: string }>();
 
-const book = ref<Book>();
-const notFound = ref(false);
-const isLoading = ref(false);
-
-const { http } = useHttp();
 const dialogController = useDialog();
 const modalController = useModalController();
+const { deleteBook } = useDeleteBook();
+const { book, getBook } = useBook(props.bookId);
 
 const seriesText = computed(() => {
   const b = book.value;
@@ -113,25 +109,6 @@ const seriesText = computed(() => {
   return `${series} #${bookInSeries}`;
 });
 
-onMounted(() => {
-  fetchBook();
-});
-
-const fetchBook = async () => {
-  isLoading.value = true;
-  notFound.value = false;
-
-  try {
-    book.value = await http('books/')
-      .get(props.bookId)
-      .notFound(() => (notFound.value = true))
-      .json<Book>();
-  } finally {
-    notFound.value = false;
-    isLoading.value = false;
-  }
-};
-
 const onBack = () => router.back();
 
 const onEdit = async () => {
@@ -139,18 +116,15 @@ const onEdit = async () => {
   if (!content) {
     return;
   }
-  const updatedContent = await modalController.show<BookContent>({
+  const result = await modalController.show<'updated'>({
     component: BookFormModal,
     options: { persistent: false, maxWidth: '750px' },
-    props: { content },
+    props: { id: props.bookId, content },
   });
 
-  if (!updatedContent) {
-    return;
+  if (result?.value === 'updated') {
+    await getBook.refetch();
   }
-
-  await http(`books/${props.bookId}`).put(updatedContent.value).res();
-  await fetchBook();
 };
 
 const onDelete = async () => {
@@ -165,11 +139,8 @@ const onDelete = async () => {
     return;
   }
 
-  const deleteResp = await http(`books/${props.bookId}`).delete().res();
-
-  if (deleteResp.ok) {
-    router.back();
-  }
+  await deleteBook.mutateAsync(props.bookId);
+  router.back();
 };
 </script>
 

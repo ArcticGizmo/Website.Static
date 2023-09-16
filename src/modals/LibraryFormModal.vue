@@ -9,14 +9,21 @@
 </template>
 
 <script setup lang="ts">
-import { useModal } from '@/composables/modal';
+import { useModal, useModalController } from '@/composables/modal';
 import { Library } from '@/types/library';
 import { computed } from 'vue';
 import { onMounted, ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
+import { useCreateLibrary, useUpdateLibrary } from '@/composables/api/libraries';
 
-const props = defineProps<{ library?: Library }>();
+const props = defineProps<{ id?: string; library?: Library }>();
 
 const modal = useModal();
+const toast = useToast();
+const modalController = useModalController();
+
+const { createLibrary } = useCreateLibrary();
+const { updateLibrary } = useUpdateLibrary();
 
 const form = ref<Library>({
   id: '',
@@ -38,7 +45,47 @@ onMounted(() => {
   f.name = lib.name;
 });
 
-const onSubmit = () => {
-  modal.close({ ...form.value });
+const onSubmit = async () => {
+  const req: Library = {
+    id: props.id || '',
+    ownerUserId: form.value.ownerUserId,
+    name: form.value.name,
+  };
+  if (props.id) {
+    modalController.showLoading({ title: 'Creating Library' });
+    await submitUpdate(req);
+  } else {
+    modalController.showLoading({ title: 'Updating Library' });
+    await submitCreate(req);
+  }
+
+  modalController.hideLoading();
+};
+
+const submitUpdate = async (content: Library) => {
+  await updateLibrary.mutateAsync(
+    { id: props.id!, content },
+    {
+      onSuccess: () => {
+        toast.success('Library Updated')!;
+        modal.close('updated');
+      },
+      onError: () => {
+        toast.error('Unable to update library at this time', { duration: 3000 });
+      },
+    },
+  );
+};
+
+const submitCreate = async (content: Library) => {
+  await createLibrary.mutateAsync(content, {
+    onSuccess: () => {
+      toast.success('Library Created')!;
+      modal.close('created');
+    },
+    onError: () => {
+      toast.error('Unable to create library at this time', { duration: 3000 });
+    },
+  });
 };
 </script>

@@ -56,7 +56,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/libraries',
     name: 'Libraries',
-    component: () => import(/* webpackChunkName: "library-list" */ '@/views/LibraryListPage.vue'),
+    component: () => import(/* webpackChunkName: "libraries" */ '@/views/LibrariesPage.vue'),
     meta: {
       icon: 'mdi-library-shelves',
       title: 'Libraries',

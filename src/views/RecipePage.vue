@@ -1,5 +1,5 @@
 <template>
-  <BasePage max-width="750px" :not-found="notFound" :loading="isLoading">
+  <BasePage max-width="750px" :loading="getRecipe.isLoading">
     <v-row class="ma-1 mb-4">
       <v-btn size="small" icon="mdi-arrow-left" @click="onBack()" />
       <v-spacer />
@@ -61,23 +61,17 @@
 </template>
 
 <script setup lang="ts">
-import { useHttp } from '@/composables/http';
 import { useDialog } from '@/composables/dialog';
 import router from '@/router';
-import { onMounted, ref } from 'vue';
 import { useModalController } from '@/composables/modal';
 import BasePage from './BasePage.vue';
-import { Recipe, RecipeContent } from '@/types/recipe';
 import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import RecipeFormModal from '@/modals/RecipeFormModal.vue';
 import ImageWithViewer from '@/components/ImageWithViewer.vue';
 import { computed } from 'vue';
+import { useDeleteRecipe, useRecipe } from '@/composables/api/recipes';
 
 const props = defineProps<{ recipeId: string }>();
-
-const recipe = ref<Recipe>();
-const notFound = ref(false);
-const isLoading = ref(false);
 
 const pad = (value: any) => `${value}`.padStart(2, '0');
 
@@ -86,29 +80,10 @@ const time = computed(() => {
   return `${value.hour}:${pad(value.minute)}`;
 });
 
-const { http } = useHttp();
-
 const dialogController = useDialog();
 const modalController = useModalController();
-
-onMounted(() => {
-  fetchRecipe();
-});
-
-const fetchRecipe = async () => {
-  isLoading.value = true;
-  notFound.value = false;
-
-  try {
-    recipe.value = await http('recipes/')
-      .get(props.recipeId)
-      .notFound(() => (notFound.value = true))
-      .json<Recipe>();
-  } finally {
-    notFound.value = false;
-    isLoading.value = false;
-  }
-};
+const { deleteRecipe } = useDeleteRecipe();
+const { recipe, getRecipe } = useRecipe(props.recipeId);
 
 const onBack = () => router.back();
 
@@ -117,18 +92,15 @@ const onEdit = async () => {
   if (!content) {
     return;
   }
-  const result = await modalController.show<RecipeContent>({
+  const result = await modalController.show<'updated'>({
     component: RecipeFormModal,
     options: { persistent: false, maxWidth: '750px' },
-    props: { content },
+    props: { id: props.recipeId, content },
   });
 
-  if (!result) {
-    return;
+  if (result?.value === 'updated') {
+    await getRecipe.refetch();
   }
-
-  await http(`recipes/${props.recipeId}`).put(result.value).res();
-  await fetchRecipe();
 };
 
 const onDelete = async () => {
@@ -143,10 +115,7 @@ const onDelete = async () => {
     return;
   }
 
-  const deleteResp = await http(`recipes/${props.recipeId}`).delete().res();
-
-  if (deleteResp.ok) {
-    router.back();
-  }
+  await deleteRecipe.mutateAsync(props.recipeId);
+  router.back();
 };
 </script>
