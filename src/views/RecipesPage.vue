@@ -31,16 +31,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import BasePage from './BasePage.vue';
-import { useHttp } from '@/composables/http';
 import { useModalController } from '@/composables/modal';
-import type { RecipeContent } from '@/types/recipe';
 import RecipeCard from '@/components/RecipeCard.vue';
 import router from '@/router';
 import RecipeFormModal from '@/modals/RecipeFormModal.vue';
 import { useRecipes } from '@/composables/api/recipes';
 import CardList from '@/components/CardList.vue';
 
-const { http } = useHttp();
 const modalController = useModalController();
 
 const notFound = ref(false);
@@ -50,16 +47,14 @@ const { recipes, refetch, fetchNextPageDebounced, hasNextPage, isLoading, isInit
   useRecipes(searchText);
 
 const onCreate = async () => {
-  const result = await modalController.show<RecipeContent>({
+  const resp = await modalController.show<'created'>({
     component: RecipeFormModal,
     options: { persistent: false, maxWidth: '750px' },
   });
-  if (!result || !result.value) {
-    return;
-  }
 
-  await http('recipes').post(result.value).res();
-  await refetch();
+  if (resp?.value === 'created') {
+    refetch();
+  }
 };
 
 const onSelect = (recipeId?: string) => {

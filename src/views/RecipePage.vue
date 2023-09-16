@@ -117,18 +117,15 @@ const onEdit = async () => {
   if (!content) {
     return;
   }
-  const result = await modalController.show<RecipeContent>({
+  const result = await modalController.show<'updated'>({
     component: RecipeFormModal,
     options: { persistent: false, maxWidth: '750px' },
     props: { content },
   });
 
-  if (!result) {
-    return;
+  if (result?.value === 'updated') {
+    await fetchRecipe();
   }
-
-  await http(`recipes/${props.recipeId}`).put(result.value).res();
-  await fetchRecipe();
 };
 
 const onDelete = async () => {

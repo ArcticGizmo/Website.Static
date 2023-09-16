@@ -85,10 +85,10 @@ const create = <K, C extends Component = Component>(config: ModalConfig<C>) => {
 
 let loadingModal: Modal<typeof LoadingModal, unknown>;
 
-const showLoading = (options: ShowLoadingOptions) => {
+const showLoading = (options?: ShowLoadingOptions) => {
   hideLoading();
 
-  const props = { title: options.title, message: options.message };
+  const props = { title: options?.title, message: options?.message };
 
   loadingModal = create({ component: LoadingModal, options: { persistent: true }, props });
   return loadingModal;

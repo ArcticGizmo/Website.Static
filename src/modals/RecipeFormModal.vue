@@ -1,7 +1,7 @@
 <template>
   <v-card class="pa-6 ma-4">
     <v-card-title class="text-h5">{{ isEdit ? 'Edit' : 'Create' }} Recipe</v-card-title>
-    <form @submit.prevent="onSubmit">
+    <v-form @submit.prevent="onSubmit">
       <v-text-field
         label="Name"
         v-model="nameField.value.value"
@@ -118,12 +118,12 @@
       </v-btn>
       <v-divider class="my-4" />
       <v-btn type="submit" color="primary" block class="mt-2">Submit</v-btn>
-    </form>
+    </v-form>
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { useModal } from '@/composables/modal';
+import { useModal, useModalController } from '@/composables/modal';
 import { RecipeContent, RecipeStep } from '@/types/recipe';
 import { useField, useForm } from 'vee-validate';
 import { onMounted } from 'vue';
@@ -134,6 +134,20 @@ import { useArrayField } from '@/composables/useArrayField';
 import TimeSelector from '@/components/TimeSelector.vue';
 import { TimeComponents } from '@/types/time';
 import draggable from 'vuedraggable';
+import { useToast } from 'vue-toast-notification';
+import { useCreateRecipe, useUpdateRecipe } from '@/composables/api/recipes';
+
+const props = defineProps<{ id?: string; content?: RecipeContent }>();
+
+const toast = useToast();
+const modalController = useModalController();
+
+const { createRecipe } = useCreateRecipe();
+const { updateRecipe } = useUpdateRecipe();
+
+const modal = useModal();
+
+const isEdit = computed(() => !!props.id);
 
 const schema = yup.object({
   name: yup.string().required().max(255),
@@ -164,7 +178,7 @@ const tagsField = useField<string[]>('tags');
 const ingredientsArrayField = useArrayField<string>('ingredients');
 const stepsArrayField = useArrayField<RecipeStep>('steps');
 
-const onSubmit = form.handleSubmit(() => {
+const onSubmit = form.handleSubmit(async () => {
   const resp: RecipeContent = {
     name: nameField.value.value,
     imageUrl: imageUrlField.value.value,
@@ -179,14 +193,44 @@ const onSubmit = form.handleSubmit(() => {
   Object.entries(resp).forEach(([key, value]) => {
     (resp as any)[key] = value ?? undefined;
   });
-  modal.close(resp);
+
+  if (isEdit.value) {
+    modalController.showLoading({ title: 'Creating Recipe' });
+    await submitUpdate(resp);
+  } else {
+    modalController.showLoading({ title: 'Updating Recipe' });
+    await submitCreate(resp);
+  }
+
+  modalController.hideLoading();
 });
 
-const props = defineProps<{ content?: RecipeContent }>();
+const submitUpdate = async (content: RecipeContent) => {
+  await updateRecipe.mutateAsync(
+    { id: props.id!, content },
+    {
+      onSuccess: () => {
+        toast.success('Recipe Updated')!;
+        modal.close('updated');
+      },
+      onError: () => {
+        toast.error('Unable to update recipe at this time', { duration: 3000 });
+      },
+    },
+  );
+};
 
-const modal = useModal();
-
-const isEdit = computed(() => !!props.content);
+const submitCreate = async (content: RecipeContent) => {
+  await createRecipe.mutateAsync(content, {
+    onSuccess: () => {
+      toast.success('Recipe Created')!;
+      modal.close('created');
+    },
+    onError: () => {
+      toast.error('Unable to create recipe at this time', { duration: 3000 });
+    },
+  });
+};
 
 onMounted(() => {
   const content = props.content;
@@ -223,11 +267,9 @@ onMounted(() => {
 });
 
 const onNewImage = (imageUrls: string[], src?: string) => {
-  if (!src) {
-    return;
+  if (src) {
+    imageUrls.push(src);
   }
-
-  imageUrls.push(src);
 };
 </script>
 

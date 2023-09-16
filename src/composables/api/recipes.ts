@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery, useMutation } from '@tanstack/vue-query';
 import { useHttp } from '../http';
-import { Recipe } from '@/types/recipe';
+import { Recipe, RecipeContent } from '@/types/recipe';
 import { Ref, computed } from 'vue';
 import { PagedData } from '@/types/api';
 import { debounce } from '@/util/debounce';
@@ -38,4 +38,32 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
   });
 
   return { recipes, fetchNextPageDebounced, ...state };
+};
+
+export const useCreateRecipe = () => {
+  const { http } = useHttp();
+
+  const mutation = useMutation({
+    mutationFn: (content: RecipeContent) => {
+      return http('recipes').post(content).res();
+    },
+  });
+
+  return { createRecipe: mutation };
+};
+
+export const useUpdateRecipe = () => {
+  const { http } = useHttp();
+
+  const mutation = useMutation({
+    mutationFn: (req: { id: string; content: RecipeContent }) => {
+      return http(`recipes/${req.id}`).put(req.content).res();
+    },
+  });
+
+  return { updateRecipe: mutation };
+};
+
+export const useDeleteRecipe = () => {
+  return {};
 };
