@@ -1,5 +1,5 @@
 <template>
-  <BasePage :not-found="notFound" :loading="isLoading">
+  <BasePage :not-found="notFound" :loading="isInitialLoading">
     <v-text-field
       class="mb-2"
       v-model="searchText"
@@ -8,31 +8,23 @@
       single-line
       hide-details
       clearable
+      @input="fetchNextPageDebounced()"
+      @click:clear="fetchNextPageDebounced()"
     >
-      <!-- @input="debounceFetchRecipes()"
-      @click:clear="debounceFetchRecipes()" -->
       <template #append>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
       </template>
     </v-text-field>
-    <!-- <pre class="text-left">
-      {{ a.data }}
-    </pre> -->
-    {{ hasNextPage }}
-    <v-btn :disabled="!hasNextPage" @click="fetchNextPage()">Next</v-btn>
-    <v-lazy>
-      <transition-group disabled="false">
-        <recipe-card
-          v-for="recipe in recipes"
-          :key="recipe.id"
-          :recipe="recipe"
-          @click="onSelect(recipe.id)"
-        />
-      </transition-group>
-    </v-lazy>
-    <h3 v-if="noMore" class="ma-4">💙💚💛💜🧡</h3>
-    <div ref="loadTrigger"></div>
-    <v-progress-linear v-if="isLoadingMore" class="mt-4" color="primary" indeterminate />
+    <CardList
+      :items="recipes"
+      :has-more="hasNextPage"
+      :is-loading="isLoading"
+      @load-more="fetchNextPageDebounced()"
+    >
+      <template #item="{ item }">
+        <recipe-card :recipe="item" @click="onSelect(item.id)" />
+      </template>
+    </CardList>
   </BasePage>
 </template>
 
@@ -46,54 +38,16 @@ import RecipeCard from '@/components/RecipeCard.vue';
 import router from '@/router';
 import RecipeFormModal from '@/modals/RecipeFormModal.vue';
 import { useRecipes } from '@/composables/api/recipes';
+import CardList from '@/components/CardList.vue';
 
 const { http } = useHttp();
 const modalController = useModalController();
 
 const notFound = ref(false);
-const isLoadingMore = ref(false);
-const noMore = ref(false);
 const searchText = ref<string>();
 
-const { recipes, refetch, fetchNextPage, hasNextPage, isLoading } = useRecipes(searchText);
-
-// onMounted(async () => {
-//   await fetchRecipes();
-//   initialLoad.value = false;
-// });
-
-// const fetchRecipes = async () => {
-//   pageNumber.value = 0;
-
-//   isLoadingMore.value = false;
-//   notFound.value = false;
-//   noMore.value = false;
-
-//   const query = {
-//     searchText: searchText.value || undefined,
-//     pageNumber: pageNumber.value,
-//     pageSize: PAGE_SIZE,
-//   };
-
-//   try {
-//     recipes.value = await http(`recipes`)
-//       .query(query)
-//       .get()
-//       .notFound(() => (notFound.value = true))
-//       .json<Recipe[]>();
-
-//     if (recipes.value.length < query.pageSize) {
-//       noMore.value = true;
-//     }
-//   } finally {
-//     isLoadingMore.value = false;
-//     notFound.value = false;
-//   }
-// };
-
-// const debounceFetchRecipes = debounce(() => fetchRecipes(), 500);
-
-// const debouncedLoadMore = debounce(() => loadMore(), 500);
+const { recipes, refetch, fetchNextPageDebounced, hasNextPage, isLoading, isInitialLoading } =
+  useRecipes(searchText);
 
 const onCreate = async () => {
   const result = await modalController.show<RecipeContent>({
@@ -112,23 +66,3 @@ const onSelect = (recipeId?: string) => {
   router.push({ name: 'Recipe', params: { recipeId } });
 };
 </script>
-
-<style scoped>
-.v-lazy {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-@media screen and (max-width: 1450px) {
-  .v-lazy {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media screen and (max-width: 800px) {
-  .v-lazy {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-</style>

@@ -3,6 +3,7 @@ import { useHttp } from '../http';
 import { Recipe } from '@/types/recipe';
 import { Ref, computed } from 'vue';
 import { PagedData } from '@/types/api';
+import { debounce } from '@/util/debounce';
 
 const PAGE_SIZE = 5;
 
@@ -11,10 +12,7 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
 
   const state = useInfiniteQuery({
     queryKey: ['recipe', searchText],
-    initialData: {
-      pages: [] as PagedData<Recipe>[],
-      pageParams: [],
-    },
+
     queryFn: async data => {
       const query = {
         searchText: undefined,
@@ -32,10 +30,12 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
     },
   });
 
+  const fetchNextPageDebounced = debounce(state.fetchNextPage, 500);
+
   const recipes = computed(() => {
     const pages = state.data.value?.pages || [];
     return pages.flatMap(d => d.data);
   });
 
-  return { recipes, ...state };
+  return { recipes, fetchNextPageDebounced, ...state };
 };
