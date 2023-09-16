@@ -4,10 +4,10 @@
     <v-card-text v-if="message">{{ message }}</v-card-text>
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="error" variant="tonal" @click="modal.close('confirm')">
+      <v-btn :color="confirmColor || 'primary'" variant="tonal" @click="modal.close('confirm')">
         {{ confirmText || 'Confirm' }}
       </v-btn>
-      <v-btn color="primary" @click="modal.close('cancel')">
+      <v-btn :color="cancelColor || 'primary'" @click="modal.close('cancel')">
         {{ cancelText || 'Cancel' }}
       </v-btn>
     </v-card-actions>
@@ -22,6 +22,8 @@ defineProps<{
   message?: string;
   confirmText?: string;
   cancelText?: string;
+  confirmColor?: string;
+  cancelColor?: string;
 }>();
 
 const modal = useModal();

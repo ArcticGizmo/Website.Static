@@ -96,18 +96,21 @@ import { useOpenBooks } from '@/composables/openBooks';
 import { useToast } from 'vue-toast-notification';
 import { useField, useForm } from 'vee-validate';
 import * as yup from 'yup';
-import { useCreateBook, useUpdateBook } from '@/composables/api/books';
+import { useCreateBook, useUpdateBook, useAlreadyExists } from '@/composables/api/books';
+import { useDialog } from '@/composables/dialog';
 
 const props = defineProps<{ id?: string; libraryId?: string; content?: BookContent }>();
 
 const modal = useModal();
 const toast = useToast();
 const modalController = useModalController();
+const dialogController = useDialog();
 
 const { fetchBook } = useOpenBooks();
 
 const { createBook } = useCreateBook(props.libraryId!);
 const { updateBook } = useUpdateBook();
+const { alreadyExists } = useAlreadyExists();
 
 const isEdit = computed(() => !!props.id);
 
@@ -239,6 +242,20 @@ const onScan = async () => {
     }
 
     const isbn = resp.value;
+
+    // check for duplicate if not editing
+    if (!isEdit.value && (await alreadyExists(props.libraryId, isbn))) {
+      const continueResp = await dialogController.confirmCancel({
+        title: 'Already in Library',
+        message: 'This book appears to already be in your library, would you like to continue anyway?',
+        confirmText: 'Yes',
+        cancelText: 'No',
+      });
+
+      if (continueResp !== 'confirm') {
+        return;
+      }
+    }
 
     modalController.showLoading({ message: 'Looking up your book now' });
     const book = await fetchBook(isbn);

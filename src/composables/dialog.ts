@@ -6,6 +6,8 @@ interface ConfirmCancelOptions {
   message?: string;
   confirmText?: string;
   cancelText?: string;
+  confirmColor?: string;
+  cancelColor?: string;
 }
 
 const modalController = useModalController();

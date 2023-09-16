@@ -79,6 +79,7 @@ const onDelete = async (libraryId: string) => {
     message: 'All books part of the library will be lost forever',
     confirmText: 'Delete',
     cancelText: 'Cancel',
+    confirmColor: 'error',
   });
 
   if (resp !== 'confirm') {

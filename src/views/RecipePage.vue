@@ -109,6 +109,7 @@ const onDelete = async () => {
     message: 'Once the recipe is deleted it will be gone forever',
     confirmText: 'Delete',
     cancelText: 'Cancel',
+    confirmColor: 'error',
   });
 
   if (resp !== 'confirm') {

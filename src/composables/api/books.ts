@@ -93,3 +93,16 @@ export const useDeleteBook = () => {
 
   return { deleteBook: mutation };
 };
+
+export const useAlreadyExists = () => {
+  const { http } = useHttp();
+
+  const alreadyExists = async (libraryId?: string, isbn?: string) => {
+    if (!libraryId || !isbn) {
+      return false;
+    }
+    return http(`libraries/${libraryId}/book-exists/${isbn}`).get().json<boolean>();
+  };
+
+  return { alreadyExists };
+};

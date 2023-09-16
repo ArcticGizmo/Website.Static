@@ -132,6 +132,7 @@ const onDelete = async () => {
     title: 'Delete Book',
     message: 'Once the book is deleted it will be gone forever',
     confirmText: 'Delete',
+    confirmColor: 'error', 
     cancelText: 'Cancel',
   });
 
