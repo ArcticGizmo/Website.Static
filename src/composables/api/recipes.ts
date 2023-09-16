@@ -50,7 +50,7 @@ export const useRecipe = (id: MaybeRef<string>) => {
     queryFn: () => http('recipes/').get(unref(id)).json<Recipe>(),
   });
 
-  return { recipe: state.data, getRecipe: state };
+  return { recipe: state.data, getRecipe: reactive(state) };
 };
 
 export const useCreateRecipe = () => {
@@ -62,7 +62,7 @@ export const useCreateRecipe = () => {
     },
   });
 
-  return { createRecipe: mutation };
+  return { createRecipe: reactive(mutation) };
 };
 
 export const useUpdateRecipe = () => {
@@ -74,7 +74,7 @@ export const useUpdateRecipe = () => {
     },
   });
 
-  return { updateRecipe: mutation };
+  return { updateRecipe: reactive(mutation) };
 };
 
 export const useDeleteRecipe = () => {
@@ -86,5 +86,5 @@ export const useDeleteRecipe = () => {
     },
   });
 
-  return { deleteRecipe: mutation };
+  return { deleteRecipe: reactive(mutation) };
 };

@@ -1,5 +1,5 @@
 <template>
-  <BasePage max-width="750px" :loading="getLibraries.isLoading.value">
+  <BasePage max-width="750px" :loading="getLibraries.isLoading">
     <h4 class="text-h4 pb-16">Check out your libraries!</h4>
     <v-row class="ma-0 pa-3">
       <v-spacer />
@@ -22,12 +22,13 @@
             variant="text"
             @click.stop="onEdit(library)"
           />
-          <v-btn
+          <!-- too scary to use at the moment with no backups enabled -->
+          <!-- <v-btn
             color="grey-darken-1"
             icon="mdi-delete"
             variant="text"
             @click.stop="onDelete(library.id)"
-          />
+          /> -->
         </template>
       </v-list-item>
     </v-list>

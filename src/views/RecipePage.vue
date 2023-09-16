@@ -1,5 +1,5 @@
 <template>
-  <BasePage max-width="750px" :loading="getRecipe.isLoading.value">
+  <BasePage max-width="750px" :loading="getRecipe.isLoading">
     <v-row class="ma-1 mb-4">
       <v-btn size="small" icon="mdi-arrow-left" @click="onBack()" />
       <v-spacer />

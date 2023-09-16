@@ -37,7 +37,7 @@ export const useCreateLibrary = () => {
     },
   });
 
-  return { createLibrary: mutation };
+  return { createLibrary: reactive(mutation) };
 };
 
 export const useUpdateLibrary = () => {
@@ -49,7 +49,7 @@ export const useUpdateLibrary = () => {
     },
   });
 
-  return { updateLibrary: mutation };
+  return { updateLibrary: reactive(mutation) };
 };
 
 export const useDeleteLibrary = () => {
@@ -61,5 +61,5 @@ export const useDeleteLibrary = () => {
     },
   });
 
-  return { deleteLibrary: mutation };
+  return { deleteLibrary: reactive(mutation) };
 };
