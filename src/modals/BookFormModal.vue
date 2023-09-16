@@ -247,7 +247,8 @@ const onScan = async () => {
     if (!isEdit.value && (await alreadyExists(props.libraryId, isbn))) {
       const continueResp = await dialogController.confirmCancel({
         title: 'Already in Library',
-        message: 'This book appears to already be in your library, would you like to continue anyway?',
+        message:
+          'This book appears to already be in your library, would you like to continue anyway?',
         confirmText: 'Yes',
         cancelText: 'No',
       });
@@ -260,6 +261,12 @@ const onScan = async () => {
     modalController.showLoading({ message: 'Looking up your book now' });
     const book = await fetchBook(isbn);
     modalController.hideLoading();
+
+    // when not editing, set the isbn number (even if the fetch fails) as it makes it easier to
+    // manually resolve the other fields
+    if (!isEdit.value) {
+      isbnField.value.value = isbn;
+    }
 
     if (!book) {
       toast.error('Could not find anything on this book');
