@@ -1,13 +1,7 @@
 <template>
   <v-lazy class="mb-2">
     <transition-group>
-      <slot
-        name="item"
-        v-for="(item, index) in items"
-        :key="index"
-        :item="item"
-        :index="index"
-      ></slot>
+      <slot name="item" v-for="(item, index) in items" :item="item" :index="index"></slot>
     </transition-group>
   </v-lazy>
   <h3 v-if="!hasMore" class="ma-4">

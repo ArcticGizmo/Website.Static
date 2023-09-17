@@ -1,5 +1,5 @@
 <template>
-  <BasePage :loading="getBooks.isLoading">
+  <BasePage :loading="getBooks.isInitialLoading">
     <v-text-field
       class="mb-2"
       v-model="searchText"
@@ -8,8 +8,7 @@
       single-line
       hide-details
       clearable
-      @input="getBooks.refetch()"
-      @click:clear="getBooks.refetch()"
+      @click:clear="searchText = ''"
     >
       <template #append>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
@@ -23,7 +22,7 @@
       @load-more="getBooks.fetchNextPageDebounced()"
     >
       <template #item="{ item }">
-        <BookCard :book="item" @click="onSelect(item.id)" />
+        <BookCard :book="item" :key="item.id" @click="onSelect(item.id)" />
       </template>
     </CardList>
   </BasePage>
@@ -38,6 +37,7 @@ import BookFormModal from '@/modals/BookFormModal.vue';
 import BasePage from './BasePage.vue';
 import CardList from '@/components/CardList.vue';
 import { useBooks } from '@/composables/api/books';
+import { useDelayedRef } from '@/composables/delayedRef';
 
 const props = defineProps<{
   libraryId: string;
@@ -46,8 +46,9 @@ const props = defineProps<{
 const modalController = useModalController();
 
 const searchText = ref<string>();
+const delayedSearchText = useDelayedRef(searchText, 500);
 
-const { books, getBooks } = useBooks(props.libraryId, searchText);
+const { books, getBooks } = useBooks(props.libraryId, delayedSearchText);
 
 const onCreate = async () => {
   const result = await modalController.show<'created'>({

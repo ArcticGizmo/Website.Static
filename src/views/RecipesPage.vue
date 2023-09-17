@@ -1,5 +1,5 @@
 <template>
-  <BasePage :loading="getRecipes.isInitialLoading">
+  <BasePage :is-loading="getRecipes.isInitialLoading">
     <v-text-field
       class="mb-2"
       v-model="searchText"
@@ -8,8 +8,7 @@
       single-line
       hide-details
       clearable
-      @input="getRecipes.refetch()"
-      @click:clear="getRecipes.refetchDebounced()"
+      @click:clear="searchText = ''"
     >
       <template #append>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
@@ -22,7 +21,7 @@
       @load-more="getRecipes.fetchNextPageDebounced()"
     >
       <template #item="{ item }">
-        <recipe-card :recipe="item" @click="onSelect(item.id)" />
+        <recipe-card :recipe="item" :key="item.id" @click="onSelect(item.id)" />
       </template>
     </CardList>
   </BasePage>
@@ -37,12 +36,14 @@ import router from '@/router';
 import RecipeFormModal from '@/modals/RecipeFormModal.vue';
 import { useRecipes } from '@/composables/api/recipes';
 import CardList from '@/components/CardList.vue';
+import { useDelayedRef } from '@/composables/delayedRef';
 
 const modalController = useModalController();
 
 const searchText = ref<string>();
+const delayedSearchText = useDelayedRef(searchText, 300);
 
-const { recipes, getRecipes } = useRecipes(searchText);
+const { recipes, getRecipes } = useRecipes(delayedSearchText);
 
 const onCreate = async () => {
   const resp = await modalController.show<'created'>({

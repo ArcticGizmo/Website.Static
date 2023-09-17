@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/vue-query';
 import { useHttp } from '../http';
 import { Recipe, RecipeContent } from '@/types/recipe';
-import { MaybeRef, Ref, computed, reactive, unref } from 'vue';
+import { MaybeRef, Ref, computed, reactive, ref, unref, watch } from 'vue';
 import { PagedData } from '@/types/api';
 import { debounce } from '@/util/debounce';
 
@@ -15,7 +15,7 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
 
     queryFn: async data => {
       const query = {
-        searchText: undefined,
+        searchText: searchText.value,
         pageNumber: data.pageParam?.[0] || 0,
         pageSize: data.pageParam?.[1] || PAGE_SIZE,
       };
@@ -30,16 +30,28 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
     },
   });
 
-  const fetchNextPageDebounced = debounce(state.fetchNextPage, 500);
+  // Override isInitialLoading to make more sense
+  const isInitialLoading = ref(true);
 
-  const refetchDebounced = debounce(state.refetch, 500);
+  watch(state.isInitialLoading, isLoading => {
+    isInitialLoading.value = isInitialLoading.value && isLoading;
+  });
+
+  const fetchNextPageDebounced = debounce(state.fetchNextPage, 500);
 
   const recipes = computed(() => {
     const pages = state.data.value?.pages || [];
     return pages.flatMap(d => d.data);
   });
 
-  return { recipes, getRecipes: reactive({ fetchNextPageDebounced, refetchDebounced, ...state }) };
+  return {
+    recipes,
+    getRecipes: reactive({
+      ...state,
+      isInitialLoading,
+      fetchNextPageDebounced,
+    }),
+  };
 };
 
 export const useRecipe = (id: MaybeRef<string>) => {
