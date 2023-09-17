@@ -4,7 +4,7 @@
       <slot name="item" v-for="(item, index) in items" :item="item" :index="index"></slot>
     </transition-group>
   </v-lazy>
-  <h3 v-if="!hasMore" class="ma-4">
+  <h3 v-if="!isLoading && !hasMore" class="ma-4">
     <slot name="no-more">💙💚💛💜🧡</slot>
   </h3>
   <div ref="loadTrigger"></div>

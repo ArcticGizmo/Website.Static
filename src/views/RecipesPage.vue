@@ -17,7 +17,7 @@
     <CardList
       :items="recipes"
       :has-more="getRecipes.hasNextPage"
-      :is-loading="getRecipes.isLoading"
+      :is-loading="getRecipes.isFetchingNextPage"
       @load-more="getRecipes.fetchNextPageDebounced()"
     >
       <template #item="{ item }">
