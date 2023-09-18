@@ -2,23 +2,27 @@ import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/vue-query';
 import { useHttp } from '../http';
 import { Book, BookContent } from '@/types/library';
 import { MaybeRef, Ref, computed, reactive, ref, unref, watch } from 'vue';
-import { PagedData } from '@/types/api';
+import { PagedData, SortField } from '@/types/api';
 import { debounce } from '@/util/debounce';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 25;
 
-export const useBooks = (libraryId: MaybeRef<string>, searchText: Ref<string | undefined>) => {
+export const useBooks = (
+  libraryId: MaybeRef<string>,
+  searchText: Ref<string | undefined>,
+  sortBy: Ref<SortField | undefined>,
+) => {
   const { http } = useHttp();
 
   const state = useInfiniteQuery({
-    queryKey: ['books', libraryId, searchText],
+    queryKey: ['books', libraryId, searchText, sortBy],
 
     queryFn: async data => {
       const query = {
         searchText: searchText.value,
         pageNumber: data.pageParam?.[0] || 0,
         pageSize: data.pageParam?.[1] || PAGE_SIZE,
-        sortBy: 'author|series|bookInSeries|title',
+        sortBy: sortBy.value?.query,
       };
       return await http(`libraries/${unref(libraryId)}/books`)
         .query(query)

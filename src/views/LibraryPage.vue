@@ -11,6 +11,7 @@
       @click:clear="searchText = ''"
     >
       <template #append>
+        <v-btn class="ml-n2 mr-2" variant="text" icon="mdi-sort" @click="onSort()"></v-btn>
         <v-btn color="primary" icon="mdi-plus" @click="onCreate()"></v-btn>
       </template>
     </v-text-field>
@@ -34,10 +35,19 @@ import BookCard from '@/components/BookCard.vue';
 import router from '@/router';
 import { useModalController } from '@/composables/modal';
 import BookFormModal from '@/modals/BookFormModal.vue';
+import SortOptionDialog from '@/modals/SortOptionDialog.vue';
 import BasePage from './BasePage.vue';
 import CardList from '@/components/CardList.vue';
 import { useBooks } from '@/composables/api/books';
 import { useDelayedRef } from '@/composables/delayedRef';
+import type { SortField } from '@/types/api';
+
+const SORT_OPTIONS: SortField[] = [
+  { name: 'Author', ascending: true, query: 'author|series|bookInSeries|title' },
+  { name: 'Author', ascending: false, query: 'author:-1|series|bookInSeries|title' },
+  { name: 'Title', ascending: true, query: 'title' },
+  { name: 'Title', ascending: false, query: 'title:-1' },
+];
 
 const props = defineProps<{
   libraryId: string;
@@ -46,9 +56,10 @@ const props = defineProps<{
 const modalController = useModalController();
 
 const searchText = ref<string>();
+const sortBy = ref<SortField>(SORT_OPTIONS[0]);
 const delayedSearchText = useDelayedRef(searchText, 500);
 
-const { books, getBooks } = useBooks(props.libraryId, delayedSearchText);
+const { books, getBooks } = useBooks(props.libraryId, delayedSearchText, sortBy);
 
 const onCreate = async () => {
   const result = await modalController.show<'created'>({
@@ -64,5 +75,17 @@ const onCreate = async () => {
 
 const onSelect = (bookId?: string) => {
   router.push({ name: 'Book', params: { bookId } });
+};
+
+const onSort = async () => {
+  const result = await modalController.show<SortField>({
+    component: SortOptionDialog,
+    options: { maxWidth: '500px' },
+    props: { value: sortBy.value, options: SORT_OPTIONS },
+  });
+
+  if (result?.value) {
+    sortBy.value = result.value;
+  }
 };
 </script>

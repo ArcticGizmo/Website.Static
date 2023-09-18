@@ -4,3 +4,9 @@ export interface PagedData<T> {
   pageSize: number;
   nextPage?: number;
 }
+
+export interface SortField {
+  name: string;
+  ascending: boolean;
+  query: string;
+}
