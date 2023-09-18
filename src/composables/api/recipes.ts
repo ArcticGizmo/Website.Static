@@ -31,7 +31,7 @@ export const useRecipes = (searchText: Ref<string | undefined>) => {
   });
 
   // Override isInitialLoading to make more sense
-  const isInitialLoading = ref(true);
+  const isInitialLoading = ref(state.isLoading.value);
 
   watch(state.isInitialLoading, isLoading => {
     isInitialLoading.value = isInitialLoading.value && isLoading;

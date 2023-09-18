@@ -18,6 +18,7 @@ export const useBooks = (libraryId: MaybeRef<string>, searchText: Ref<string | u
         searchText: searchText.value,
         pageNumber: data.pageParam?.[0] || 0,
         pageSize: data.pageParam?.[1] || PAGE_SIZE,
+        sortBy: 'author|series|bookInSeries|title',
       };
       return await http(`libraries/${unref(libraryId)}/books`)
         .query(query)
@@ -34,7 +35,7 @@ export const useBooks = (libraryId: MaybeRef<string>, searchText: Ref<string | u
   });
 
   // Override isInitialLoading to make more sense
-  const isInitialLoading = ref(true);
+  const isInitialLoading = ref(state.isLoading.value);
 
   watch(state.isInitialLoading, isLoading => {
     isInitialLoading.value = isInitialLoading.value && isLoading;

@@ -23,7 +23,7 @@ import { onMounted } from 'vue';
 
 const READY_AFTER_MS = 2_000;
 const CHECK_INTERVAL_MS = 5 * 60 * 1000;
-const CHECK_AFTER_FAILURE = 15_000;
+const CHECK_AFTER_FAILURE = 3_000;
 
 const { http } = useSimpleHttp();
 
@@ -33,7 +33,7 @@ const serverAlive = ref(false);
 
 const checkStatus = async () => {
   try {
-    const resp = await http('status').get().res();
+    const resp = await http('healthz').get().res();
     serverAlive.value = resp.ok;
     setTimeout(() => checkStatus(), CHECK_INTERVAL_MS);
   } catch (error) {

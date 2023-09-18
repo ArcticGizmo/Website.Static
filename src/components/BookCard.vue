@@ -78,7 +78,7 @@ const seriesText = computed(() => {
 
 <style scoped>
 .book-card {
-  min-height: 12rem;
+  min-height: 10rem;
   user-select: none;
 }
 .series {

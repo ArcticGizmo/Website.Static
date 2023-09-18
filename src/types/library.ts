@@ -13,6 +13,7 @@ export interface Book {
 export interface BookContent {
   isbn?: string;
   title: string;
+  author?: string;
   authors?: string[];
   coverImageUrl?: string;
   series?: string;
