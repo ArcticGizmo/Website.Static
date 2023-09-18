@@ -50,6 +50,7 @@ const props = defineProps({
   modelValue: String,
   fallbackIcon: String,
   maxFileSize: { type: Number, default: 10_000_000 },
+  maxLength: { type: Number, default: 320 },
 });
 
 const modal = useModal();
@@ -93,7 +94,8 @@ watch(fileValue, async value => {
   }
 
   try {
-    src.value = await getBase64(img);
+    const base64 = await getBase64(img);
+    src.value = await resizeImage(base64, props.maxLength);
   } catch (error) {
     errorMessage.value = 'Unable to convert image';
   }
@@ -114,5 +116,43 @@ const onSelect = () => {
 
 const onClear = () => {
   modal.close(null);
+};
+
+const resizeImage = async (
+  base64: string | undefined,
+  maxLength: number,
+): Promise<string | undefined> => {
+  if (!base64) {
+    return;
+  }
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = base64;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const { width, height } = scale(img.width, img.height, maxLength);
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL());
+    };
+  });
+};
+
+const scale = (width: number, height: number, maxLength?: number) => {
+  if (!maxLength) {
+    return { width, height };
+  }
+
+  if (width < maxLength && height < maxLength) {
+    return { width, height };
+  }
+
+  if (width > height) {
+    return { width: maxLength, height: Math.trunc((height / width) * maxLength) };
+  }
+
+  return { width: Math.trunc((width / height) * maxLength), height: maxLength };
 };
 </script>
