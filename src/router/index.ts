@@ -101,6 +101,16 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/todos',
+    name: 'Todos',
+    component: () => import(/* webpackChunkName: "todos" */ '@/views/TodosPage.vue'),
+    meta: {
+      title: 'Todos',
+      icon: 'mdi-format-list-checks',
+      secure: true,
+    },
+  },
+  {
     path: '/security',
     name: 'Security',
     component: () => import(/* webpackChunkName: "security" */ '@/views/SecurityPage.vue'),
