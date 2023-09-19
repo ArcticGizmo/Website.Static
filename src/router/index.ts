@@ -7,7 +7,6 @@ declare module 'vue-router' {
   interface RouteMeta {
     icon?: string;
     title?: string;
-    secure?: boolean;
   }
 }
 
@@ -29,9 +28,6 @@ export const routes: RouteRecordRaw[] = [
     path: '/my-profile',
     name: 'MyProfile',
     component: () => import(/* webpackChunkName: "my-profile" */ '@/views/MyProfilePage.vue'),
-    meta: {
-      secure: true,
-    },
   },
   {
     path: '/my-wife',
@@ -60,7 +56,6 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       icon: 'mdi-library-shelves',
       title: 'Libraries',
-      secure: true,
     },
   },
   {
@@ -68,18 +63,12 @@ export const routes: RouteRecordRaw[] = [
     name: 'Library',
     props: true,
     component: () => import(/* webpackChunkName: "library" */ '@/views/LibraryPage.vue'),
-    meta: {
-      secure: true,
-    },
   },
   {
     path: '/book/:bookId',
     name: 'Book',
     props: true,
     component: () => import(/* webpackChunkName: "book" */ '@/views/BookPage.vue'),
-    meta: {
-      secure: true,
-    },
   },
   {
     path: '/recipes',
@@ -88,7 +77,6 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Recipes',
       icon: 'mdi-chef-hat',
-      secure: true,
     },
   },
   {
@@ -96,9 +84,6 @@ export const routes: RouteRecordRaw[] = [
     name: 'Recipe',
     props: true,
     component: () => import(/* webpackChunkName: "recipe" */ '@/views/RecipePage.vue'),
-    meta: {
-      secure: true,
-    },
   },
   {
     path: '/todos',
@@ -107,7 +92,6 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: 'Todos',
       icon: 'mdi-format-list-checks',
-      secure: true,
     },
   },
   {
@@ -117,21 +101,15 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       icon: 'mdi-security',
       title: 'Security',
-      secure: true,
     },
   },
 ];
-
-// Add protection guards
-routes.forEach(r => {
-  if (r.meta?.secure) {
-    r.beforeEnter = authGuard;
-  }
-});
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(authGuard);
 
 export default router;

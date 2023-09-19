@@ -29,16 +29,7 @@
           :prepend-icon="route.meta?.icon"
           :title="route.meta?.title"
           :value="route.name"
-        >
-          <template v-if="route.meta?.secure && !isAuthenticated" #append>
-            <v-tooltip activator="parent" location="right">
-              <template #activator>
-                <v-icon icon="mdi-lock"></v-icon>
-              </template>
-              Requires Login
-            </v-tooltip>
-          </template>
-        </v-list-item>
+        />
       </router-link>
     </v-list>
   </v-navigation-drawer>
@@ -51,7 +42,7 @@ import { computed } from 'vue';
 import { useAuth } from '@/composables/auth0';
 
 const { navBarOpen, toggleNavBar } = useNavigation();
-const { user, isAuthenticated, login, logout } = useAuth();
+const { user, login, logout } = useAuth();
 
 const filteredRoutes = computed(() => {
   return routes.filter(r => r.meta?.title);
