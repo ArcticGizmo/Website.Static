@@ -1,7 +1,7 @@
 <template>
   <ImageWithPlaceholder
     class="image-with-viewer"
-    :class="{ border: withBorder }"
+    :class="{ border: withBorder, 'can-hover': !!props.src }"
     v-bind="props"
     @click="onView()"
   />
@@ -23,12 +23,14 @@ const props = defineProps({
 const modalController = useModalController();
 
 const onView = async () => {
-  await modalController.show({ component: ImageViewerModal, props: { src: props.src } });
+  if (props.src) {
+    await modalController.show({ component: ImageViewerModal, props: { src: props.src } });
+  }
 };
 </script>
 
 <style scoped>
-.image-with-viewer:hover {
+.can-hover:hover {
   cursor: pointer;
   opacity: 0.9;
 }

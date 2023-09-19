@@ -9,11 +9,7 @@
     <v-card v-if="book" class="pa-4" border rounded elevation="4">
       <v-row>
         <v-col cols="4">
-          <ImageWithPlaceholder
-            class="fill-height"
-            :src="book.content.coverImageUrl"
-            height="250"
-          />
+          <ImageWithViewer class="fill-height" :src="book.content.coverImageUrl" height="250" />
           <div class="icons">
             <v-tooltip v-if="book.content.wishlist" location="top">
               <template #activator="{ props }">
@@ -79,11 +75,11 @@
 import { useDialog } from '@/composables/dialog';
 import router from '@/router';
 import { computed } from 'vue';
-import ImageWithPlaceholder from '@/components/ImageWithPlaceholder.vue';
 import BookFormModal from '@/modals/BookFormModal.vue';
 import { useModalController } from '@/composables/modal';
 import BasePage from './BasePage.vue';
 import { useBook, useDeleteBook } from '@/composables/api/books';
+import ImageWithViewer from '@/components/ImageWithViewer.vue';
 
 const props = defineProps<{ bookId: string }>();
 
@@ -132,7 +128,7 @@ const onDelete = async () => {
     title: 'Delete Book',
     message: 'Once the book is deleted it will be gone forever',
     confirmText: 'Delete',
-    confirmColor: 'error', 
+    confirmColor: 'error',
     cancelText: 'Cancel',
   });
 
